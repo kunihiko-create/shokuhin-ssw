@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>食品製造SSW 用語フラッシュカード</title>
+<style>
+  :root {
+    --orange: #BA7517;
+    --orange-dark: #9a5f0f;
+    --orange-light: #fef3e2;
+    --orange-mid: #f5d5a0;
+    --white: #ffffff;
+    --gray: #6b7280;
+    --gray-light: #f3f4f6;
+    --text: #1f2937;
+    --text-sub: #6b7280;
+    --shadow: 0 4px 20px rgba(0,0,0,0.12);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Hiragino Kaku Gothic ProN', 'Meiryo', 'Noto Sans JP', sans-serif;
+    background: #fef8f0;
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    background: var(--orange);
+    color: white;
+    padding: 14px 16px 12px;
+    position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 10px rgba(186,117,23,0.35);
+  }
+  .header-inner { max-width: 600px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+  .header-title { font-size: 1.05rem; font-weight: bold; line-height: 1.3; }
+  .header-title small { display: block; font-size: 0.7rem; font-weight: normal; opacity: 0.85; margin-top: 1px; }
+  .header-count {
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px; padding: 4px 12px;
+    font-size: 0.8rem; font-weight: bold; white-space: nowrap;
+  }
+
+  /* ===== CATEGORIES ===== */
+  .cat-wrap {
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    overflow-x: auto; white-space: nowrap;
+    padding: 10px 12px;
+    scrollbar-width: none;
+  }
+  .cat-wrap::-webkit-scrollbar { display: none; }
+  .cat-inner { display: inline-flex; gap: 8px; }
+  .cat-btn {
+    padding: 6px 14px; border-radius: 20px; border: none; cursor: pointer;
+    font-size: 0.78rem; font-weight: bold;
+    background: var(--gray-light); color: var(--gray);
+    transition: all .2s; white-space: nowrap;
+  }
+  .cat-btn:hover { background: var(--orange-light); color: var(--orange); }
+  .cat-btn.active { background: var(--orange); color: white; }
+
+  /* ===== MAIN ===== */
+  main { max-width: 600px; margin: 0 auto; padding: 20px 16px 100px; }
+
+  /* ===== PROGRESS ===== */
+  .progress-area { margin-bottom: 16px; }
+  .progress-top { display: flex; justify-content: space-between; font-size: 0.78rem; color: var(--text-sub); margin-bottom: 6px; }
+  .progress-bar { background: #fde8c0; border-radius: 6px; height: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--orange); border-radius: 6px; transition: width .4s; }
+
+  /* ===== CARD ===== */
+  .card-area { perspective: 1200px; margin-bottom: 20px; cursor: pointer; }
+  .card-inner {
+    position: relative; width: 100%;
+    transition: transform 0.55s cubic-bezier(0.4,0.2,0.2,1);
+    transform-style: preserve-3d;
+  }
+  .card-area.flipped .card-inner { transform: rotateY(180deg); }
+
+  .card-face {
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 28px 24px;
+    min-height: 260px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .card-front { background: white; }
+  .card-back {
+    background: var(--orange);
+    color: white;
+    position: absolute; top: 0; left: 0; width: 100%;
+    transform: rotateY(180deg);
+  }
+
+  /* front */
+  .card-cat-tag {
+    display: inline-block;
+    background: var(--orange-light); color: var(--orange);
+    border-radius: 10px; padding: 3px 10px;
+    font-size: 0.7rem; font-weight: bold; margin-bottom: 20px;
+  }
+  .card-term {
+    text-align: center; flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 8px;
+  }
+  .term-kanji { font-size: 2.2rem; font-weight: bold; line-height: 1.3; color: var(--text); }
+  .term-reading { font-size: 0.9rem; color: var(--text-sub); }
+  .card-hint { text-align: center; font-size: 0.72rem; color: var(--text-sub); opacity: 0.7; margin-top: 10px; }
+  .flip-icon { font-size: 1rem; }
+
+  /* back */
+  .back-cat-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2); color: white;
+    border-radius: 10px; padding: 3px 10px;
+    font-size: 0.7rem; font-weight: bold; margin-bottom: 16px;
+  }
+  .back-term { font-size: 1.3rem; font-weight: bold; margin-bottom: 16px; text-align: center; }
+  .back-def-label { font-size: 0.68rem; opacity: 0.75; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
+  .back-def-ja {
+    font-size: 0.88rem; line-height: 1.7;
+    background: rgba(255,255,255,0.15); border-radius: 10px;
+    padding: 12px 14px; margin-bottom: 14px;
+  }
+  .back-def-id {
+    font-size: 0.82rem; line-height: 1.6;
+    background: rgba(255,255,255,0.1); border-radius: 10px;
+    padding: 10px 14px; border-left: 3px solid rgba(255,255,255,0.4);
+  }
+  .id-lang { font-size: 0.65rem; opacity: 0.7; display: block; margin-bottom: 3px; }
+
+  /* ===== CONTROLS ===== */
+  .controls { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .ctrl-btn {
+    width: 52px; height: 52px; border-radius: 50%; border: none; cursor: pointer;
+    font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+    transition: all .2s; font-weight: bold;
+  }
+  .ctrl-btn:hover { transform: scale(1.08); }
+  .btn-prev { background: var(--gray-light); color: var(--gray); }
+  .btn-prev:hover { background: #e5e7eb; }
+  .btn-next { background: var(--orange); color: white; box-shadow: 0 4px 14px rgba(186,117,23,0.4); }
+  .btn-next:hover { background: var(--orange-dark); }
+  .card-num { font-size: 1rem; font-weight: bold; color: var(--text-sub); text-align: center; flex: 1; }
+
+  /* ===== BOTTOM TOOLBAR ===== */
+  .bottom-bar {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; border-top: 1px solid #e5e7eb;
+    padding: 10px 16px 16px;
+    display: flex; gap: 10px; justify-content: center;
+    max-width: 600px; margin: 0 auto;
+  }
+  .bottom-btn {
+    flex: 1; padding: 10px 0; border-radius: 12px; border: none; cursor: pointer;
+    font-size: 0.82rem; font-weight: bold; transition: all .2s;
+  }
+  .btn-shuffle { background: var(--orange-light); color: var(--orange); }
+  .btn-shuffle:hover { background: var(--orange-mid); }
+  .btn-reset { background: #fff3e0; color: #d97706; }
+  .btn-reset:hover { background: #ffe0b2; }
+  .btn-mark { background: var(--gray-light); color: var(--gray); }
+  .btn-mark.marked { background: #fef3c7; color: #d97706; }
+  .btn-mark:hover { background: #e5e7eb; }
+
+  /* ===== RESULT PANEL ===== */
+  .result-panel {
+    display: none; text-align: center;
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 36px 24px;
+  }
+  .result-panel.show { display: block; }
+  .result-panel h2 { font-size: 1.5rem; color: var(--orange); margin-bottom: 10px; }
+  .result-panel p { color: var(--text-sub); font-size: 0.9rem; margin-bottom: 20px; }
+  .result-panel button {
+    background: var(--orange); color: white; border: none;
+    padding: 12px 32px; border-radius: 30px; font-size: 0.95rem; cursor: pointer;
+    font-weight: bold; box-shadow: 0 4px 14px rgba(186,117,23,0.4);
+  }
+
+  /* ===== LOGIN OVERLAY ===== */
+  #loginOverlay {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(160deg, #7a4a08 0%, #BA7517 55%, #e8a840 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .login-box {
+    background: white; border-radius: 24px;
+    padding: 40px 32px; width: 100%; max-width: 360px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    text-align: center;
+  }
+  .login-logo { font-size: 2.6rem; margin-bottom: 8px; }
+  .login-title { font-size: 1.25rem; font-weight: bold; color: var(--text); margin-bottom: 4px; }
+  .login-sub { font-size: 0.78rem; color: var(--text-sub); margin-bottom: 28px; line-height: 1.5; }
+  .login-label { text-align: left; font-size: 0.78rem; font-weight: bold; color: var(--text-sub); margin-bottom: 6px; display: block; }
+  .login-input {
+    width: 100%; padding: 13px 16px; border-radius: 12px;
+    border: 2px solid #e5e7eb; font-size: 1rem;
+    outline: none; transition: border-color .2s;
+    font-family: inherit; letter-spacing: 0.1em; text-align: center;
+  }
+  .login-input:focus { border-color: var(--orange); }
+  .login-btn {
+    width: 100%; margin-top: 16px; padding: 14px;
+    background: var(--orange); color: white; border: none;
+    border-radius: 30px; font-size: 1rem; font-weight: bold;
+    cursor: pointer; box-shadow: 0 4px 14px rgba(186,117,23,0.4);
+    transition: background .2s;
+  }
+  .login-btn:hover { background: var(--orange-dark); }
+  .login-error {
+    display: none; margin-top: 12px; padding: 10px 14px;
+    background: #fee2e2; color: #dc2626; border-radius: 10px;
+    font-size: 0.82rem; font-weight: bold;
+  }
+  .login-error.show { display: block; }
+  .login-note { font-size: 0.7rem; color: #9ca3af; margin-top: 18px; line-height: 1.5; }
+
+  /* ===== MODE TABS ===== */
+  .mode-tabs {
+    background: white; border-bottom: 2px solid #e5e7eb;
+    display: flex; max-width: 600px; margin: 0 auto;
+  }
+  .mode-tab {
+    flex: 1; padding: 11px 0; border: none; background: none; cursor: pointer;
+    font-size: 0.88rem; font-weight: bold; color: var(--gray);
+    border-bottom: 3px solid transparent; margin-bottom: -2px;
+    transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .mode-tab:hover { color: var(--orange); }
+  .mode-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+  /* ===== QUIZ SCREEN ===== */
+  #quizScreen { display: none; }
+  #quizScreen.active { display: block; }
+  #flashScreen { display: block; }
+  #flashScreen.hidden { display: none; }
+
+  .quiz-score-bar {
+    background: white; border-radius: 12px; padding: 14px 18px;
+    margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .quiz-score-nums { font-size: 0.82rem; color: var(--text-sub); white-space: nowrap; }
+  .quiz-score-nums strong { color: var(--text); font-size: 1rem; }
+  .quiz-mini-bar { flex: 1; background: #e5e7eb; border-radius: 6px; height: 8px; overflow: hidden; }
+  .quiz-mini-fill { height: 100%; background: var(--orange); border-radius: 6px; transition: width .4s; }
+  .quiz-score-pct { font-size: 0.9rem; font-weight: bold; color: var(--orange); white-space: nowrap; }
+
+  .quiz-qnum { font-size: 0.72rem; color: var(--text-sub); margin-bottom: 10px; }
+
+  .quiz-question-card {
+    background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 24px 22px; margin-bottom: 16px;
+  }
+  .quiz-qtype {
+    display: inline-block; font-size: 0.68rem; font-weight: bold;
+    background: var(--orange-light); color: var(--orange);
+    border-radius: 8px; padding: 3px 10px; margin-bottom: 14px;
+  }
+  .quiz-question-text { font-size: 1.05rem; font-weight: bold; line-height: 1.6; color: var(--text); }
+  .quiz-question-sub { font-size: 0.78rem; color: var(--text-sub); margin-top: 6px; line-height: 1.5; }
+
+  .quiz-choices { display: flex; flex-direction: column; gap: 10px; }
+  .quiz-choice {
+    width: 100%; padding: 14px 18px; border-radius: 12px;
+    border: 2px solid #e5e7eb; background: white; cursor: pointer;
+    font-size: 0.88rem; font-weight: bold; color: var(--text);
+    text-align: left; line-height: 1.4; transition: all .18s;
+  }
+  .quiz-choice:hover:not(:disabled) { border-color: var(--orange); background: var(--orange-light); color: var(--orange); }
+  .quiz-choice.correct { border-color: #16a34a; background: #dcfce7; color: #15803d; }
+  .quiz-choice.wrong   { border-color: #dc2626; background: #fee2e2; color: #dc2626; }
+  .quiz-choice.show-correct { border-color: #16a34a; background: #dcfce7; color: #15803d; }
+  .quiz-choice:disabled { cursor: default; }
+
+  .quiz-feedback {
+    display: none; border-radius: 12px; padding: 14px 18px; margin-top: 12px;
+    font-size: 0.85rem; line-height: 1.6;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.ok  { background: #dcfce7; color: #15803d; border: 1px solid #86efac; }
+  .quiz-feedback.ng  { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+  .quiz-feedback .fb-answer { font-weight: bold; margin-bottom: 4px; font-size: 0.95rem; }
+  .quiz-feedback .fb-def { font-size: 0.82rem; margin-top: 6px; opacity: 0.85; }
+
+  .quiz-next-btn {
+    display: none; width: 100%; margin-top: 14px;
+    padding: 14px; border-radius: 30px; border: none; cursor: pointer;
+    background: var(--orange); color: white; font-size: 0.95rem; font-weight: bold;
+    box-shadow: 0 4px 14px rgba(186,117,23,0.35); transition: background .2s;
+  }
+  .quiz-next-btn:hover { background: var(--orange-dark); }
+  .quiz-next-btn.show { display: block; }
+
+  .quiz-result {
+    display: none; text-align: center; background: white;
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px 24px;
+  }
+  .quiz-result.show { display: block; }
+  .quiz-result-emoji { font-size: 3rem; margin-bottom: 12px; }
+  .quiz-result h2 { font-size: 1.5rem; color: var(--text); margin-bottom: 6px; }
+  .quiz-result .result-score { font-size: 3rem; font-weight: bold; color: var(--orange); margin: 16px 0 4px; }
+  .quiz-result .result-label { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 20px; }
+  .result-breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+  .result-cell { background: var(--gray-light); border-radius: 10px; padding: 12px 8px; }
+  .result-cell .rc-num { font-size: 1.4rem; font-weight: bold; }
+  .result-cell .rc-label { font-size: 0.72rem; color: var(--text-sub); margin-top: 2px; }
+  .result-cell.ok .rc-num { color: #16a34a; }
+  .result-cell.ng .rc-num { color: #dc2626; }
+  .result-btns { display: flex; flex-direction: column; gap: 10px; }
+  .result-btn {
+    padding: 13px 0; border-radius: 30px; border: none; cursor: pointer;
+    font-size: 0.92rem; font-weight: bold; transition: all .2s;
+  }
+  .result-btn.primary { background: var(--orange); color: white; box-shadow: 0 4px 14px rgba(186,117,23,0.35); }
+  .result-btn.secondary { background: #fff3e0; color: #d97706; }
+  .result-btn.tertiary { background: var(--gray-light); color: var(--gray); }
+
+  .quiz-start-screen {
+    text-align: center; background: white; border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 36px 24px;
+  }
+  .quiz-start-screen h2 { font-size: 1.3rem; color: var(--text); margin-bottom: 8px; }
+  .quiz-start-screen p { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 24px; line-height: 1.6; }
+  .quiz-start-options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .quiz-opt-btn {
+    padding: 14px 18px; border-radius: 12px; border: 2px solid #e5e7eb;
+    background: white; cursor: pointer; font-size: 0.88rem; font-weight: bold;
+    text-align: left; display: flex; align-items: center; gap: 10px; transition: all .2s;
+  }
+  .quiz-opt-btn:hover { border-color: var(--orange); background: var(--orange-light); }
+  .quiz-opt-btn.selected { border-color: var(--orange); background: var(--orange-light); color: var(--orange); }
+  .quiz-opt-btn .opt-icon { font-size: 1.3rem; }
+  .quiz-opt-btn .opt-text { line-height: 1.3; }
+  .quiz-opt-btn .opt-sub { font-size: 0.72rem; font-weight: normal; color: var(--text-sub); display: block; }
+  .quiz-start-btn {
+    width: 100%; padding: 14px; border-radius: 30px; border: none; cursor: pointer;
+    background: var(--orange); color: white; font-size: 1rem; font-weight: bold;
+    box-shadow: 0 4px 14px rgba(186,117,23,0.35); transition: background .2s;
+  }
+  .quiz-start-btn:hover { background: var(--orange-dark); }
+
+  .bottom-bar-quiz {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; border-top: 1px solid #e5e7eb;
+    padding: 10px 16px 16px;
+    display: none; gap: 10px; justify-content: center;
+    max-width: 600px; margin: 0 auto;
+  }
+  .bottom-bar-quiz.active { display: flex; }
+
+  @media (max-width: 400px) {
+    .term-kanji { font-size: 1.8rem; }
+    .card-face { padding: 22px 18px; min-height: 240px; }
+  }
+
+  /* ===== RUBY ===== */
+  ruby { ruby-align: center; }
+  rt { font-size: 0.55em; color: inherit; }
+  .card-back rt { color: rgba(255,255,255,0.85); }
+
+  /* ===== QUIZ INDONESIAN ===== */
+  .q-id-text {
+    font-size: 0.8rem; color: #6b7280; margin-top: 8px;
+    padding-top: 8px; border-top: 1px solid #e5e7eb;
+    line-height: 1.5; font-weight: normal;
+  }
+  .choice-id {
+    display: block; font-size: 0.72rem; color: #6b7280;
+    margin-top: 5px; padding-top: 5px;
+    border-top: 1px solid #e5e7eb;
+    font-weight: normal; line-height: 1.4;
+  }
+  .quiz-choice.correct .choice-id { color: #15803d; border-top-color: #86efac; }
+  .quiz-choice.wrong   .choice-id { color: #dc2626; border-top-color: #fca5a5; }
+
+  /* ===== SETTINGS BAR ===== */
+  .settings-bar {
+    background: #fafafa; border-bottom: 1px solid #e5e7eb;
+    padding: 7px 12px; display: flex; gap: 8px; align-items: center;
+    max-width: 600px; margin: 0 auto;
+  }
+  .settings-label {
+    font-size: 0.7rem; color: var(--text-sub); font-weight: bold;
+    white-space: nowrap;
+  }
+  .setting-btn {
+    padding: 5px 12px; border-radius: 16px; border: 1.5px solid #d1d5db;
+    background: white; color: var(--gray); font-size: 0.75rem; font-weight: bold;
+    cursor: pointer; transition: all .2s; white-space: nowrap;
+  }
+  .setting-btn:hover { border-color: var(--orange); color: var(--orange); }
+  .setting-btn.on { background: var(--orange); color: white; border-color: var(--orange); }
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN OVERLAY ===== -->
+<div id="loginOverlay">
+  <div class="login-box">
+    <div class="login-logo">🏭</div>
+    <div class="login-title">食品製造SSW 用語カード</div>
+    <div class="login-sub">特定技能1号「飲食料品製造業」試験対策<br>Kartu Kosakata Produksi Pangan SSW</div>
+    <label class="login-label" for="loginInput">パスワード / Password</label>
+    <div style="position:relative;">
+      <input class="login-input" id="loginInput" type="password"
+        placeholder="パスワードを入力"
+        style="padding-right:48px;"
+        onkeydown="if(event.key==='Enter') doLogin()" />
+      <button id="togglePwBtn" onclick="togglePwVisibility()"
+        type="button"
+        style="position:absolute; right:12px; top:50%; transform:translateY(-50%);
+               background:none; border:none; cursor:pointer; font-size:1.2rem;
+               color:#9ca3af; padding:4px; line-height:1;"
+        title="パスワードを表示/非表示">👁</button>
+    </div>
+    <div class="login-error" id="loginError">❌ パスワードが違います / Password salah</div>
+    <button class="login-btn" onclick="doLogin()">ログイン／Masuk</button>
+    <div class="login-note">このデバイスでは一度入力すると次回から不要です。<br>Di perangkat ini, cukup masukkan sekali.</div>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="header-title">
+      食品製造SSW 用語カード
+      <small>特定技能1号「飲食料品製造業」試験対策</small>
+    </div>
+    <div class="header-count" id="headerCount">0 / 0</div>
+  </div>
+</header>
+
+<div style="background:white; border-bottom:1px solid #e5e7eb;">
+  <div class="mode-tabs">
+    <button class="mode-tab active" id="tabFlash" onclick="switchMode('flash')">🃏 フラッシュカード</button>
+    <button class="mode-tab" id="tabQuiz"  onclick="switchMode('quiz')">📝 4択練習</button>
+  </div>
+</div>
+
+<div style="background:#fafafa; border-bottom:1px solid #e5e7eb;">
+  <div class="settings-bar">
+    <span class="settings-label">表示設定：</span>
+    <button class="setting-btn" id="rubyBtn" onclick="toggleRuby()">ルビ OFF</button>
+    <button class="setting-btn on"  id="idBtn"   onclick="toggleId()">🇮🇩 ON</button>
+  </div>
+</div>
+
+<div class="cat-wrap" id="catWrap">
+  <div class="cat-inner" id="catButtons"></div>
+</div>
+
+<main>
+
+<!-- ===== QUIZ SCREEN ===== -->
+<div id="quizScreen">
+  <div class="quiz-start-screen" id="quizStartScreen">
+    <h2>📝 4択練習</h2>
+    <p>出題形式と問題数を選んでスタート！<br>カテゴリは上のタブで絞り込めます。</p>
+    <div class="quiz-start-options">
+      <button class="quiz-opt-btn selected" id="optMixed" onclick="selectQtype('mixed')">
+        <span class="opt-icon">🔀</span>
+        <span class="opt-text">ミックス出題
+          <span class="opt-sub">「用語→意味」と「意味→用語」をランダムで出題</span>
+          <span class="opt-sub" style="color:#6b7280; margin-top:2px;">Campuran: "istilah→arti" dan "arti→istilah" secara acak</span>
+        </span>
+      </button>
+      <button class="quiz-opt-btn" id="optTerm2Def" onclick="selectQtype('term2def')">
+        <span class="opt-icon">🔍</span>
+        <span class="opt-text">用語の意味を選ぶ
+          <span class="opt-sub">用語が表示され、4つの意味から選ぶ</span>
+          <span class="opt-sub" style="color:#6b7280; margin-top:2px;">Istilah ditampilkan → pilih artinya dari 4 pilihan</span>
+        </span>
+      </button>
+      <button class="quiz-opt-btn" id="optDef2Term" onclick="selectQtype('def2term')">
+        <span class="opt-icon">💬</span>
+        <span class="opt-text">意味から用語を選ぶ
+          <span class="opt-sub">説明文が表示され、4つの用語から選ぶ</span>
+          <span class="opt-sub" style="color:#6b7280; margin-top:2px;">Penjelasan ditampilkan → pilih istilahnya dari 4 pilihan</span>
+        </span>
+      </button>
+    </div>
+    <div style="display:flex; gap:10px; margin-bottom:20px;">
+      <button class="quiz-opt-btn" id="qnum10" onclick="selectQnum(10)" style="flex:1; text-align:center; padding:10px;">10問</button>
+      <button class="quiz-opt-btn selected" id="qnum20" onclick="selectQnum(20)" style="flex:1; text-align:center; padding:10px;">20問</button>
+      <button class="quiz-opt-btn" id="qnumAll" onclick="selectQnum(0)" style="flex:1; text-align:center; padding:10px;">全問</button>
+    </div>
+    <button class="quiz-start-btn" onclick="startQuiz()">スタート ›</button>
+  </div>
+
+  <div id="quizQuestionScreen" style="display:none;">
+    <div class="quiz-score-bar">
+      <div class="quiz-score-nums"><strong id="qScoreCorrect">0</strong> / <span id="qScoreTotal">0</span> 正解</div>
+      <div class="quiz-mini-bar"><div class="quiz-mini-fill" id="qMiniFill" style="width:0%"></div></div>
+      <div class="quiz-score-pct" id="qScorePct">0%</div>
+    </div>
+    <div class="quiz-qnum" id="qNumLabel">第1問 / 20問</div>
+    <div class="quiz-question-card">
+      <span class="quiz-qtype" id="qTypeLabel">用語→意味</span>
+      <div class="quiz-question-text" id="qQuestionText">-</div>
+      <div class="quiz-question-sub" id="qQuestionSub"></div>
+      <div class="q-id-text" id="qQuestionId" style="display:none;"></div>
+    </div>
+    <div class="quiz-choices" id="qChoices">
+      <button class="quiz-choice" id="choice0" onclick="handleAnswer(0)"></button>
+      <button class="quiz-choice" id="choice1" onclick="handleAnswer(1)"></button>
+      <button class="quiz-choice" id="choice2" onclick="handleAnswer(2)"></button>
+      <button class="quiz-choice" id="choice3" onclick="handleAnswer(3)"></button>
+    </div>
+    <div class="quiz-feedback" id="qFeedback">
+      <div class="fb-answer" id="fbAnswer"></div>
+      <div class="fb-def" id="fbDef"></div>
+      <div class="fb-def" id="fbDefId" style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(0,0,0,0.08); font-size:0.78rem; opacity:0.8;">
+        <span style="font-size:0.65rem; font-weight:bold; opacity:0.7; display:block; margin-bottom:2px;">🇮🇩 Bahasa Indonesia</span>
+        <span id="fbDefIdText"></span>
+      </div>
+    </div>
+    <button class="quiz-next-btn" id="qNextBtn" onclick="nextQuizQuestion()">次の問題 ›</button>
+  </div>
+
+  <div class="quiz-result" id="quizResultScreen">
+    <div class="quiz-result-emoji" id="resultEmoji">🎉</div>
+    <h2 id="resultTitle">お疲れ様でした！</h2>
+    <div class="result-score" id="resultScoreDisplay">0 / 0</div>
+    <div class="result-label" id="resultScoreLabel">正解率 0%</div>
+    <div class="result-breakdown">
+      <div class="result-cell ok"><div class="rc-num" id="rcCorrect">0</div><div class="rc-label">✅ 正解</div></div>
+      <div class="result-cell ng"><div class="rc-num" id="rcWrong">0</div><div class="rc-label">❌ 不正解</div></div>
+    </div>
+    <div class="result-btns">
+      <button class="result-btn primary" onclick="retryWrong()" id="retryWrongBtn">❌ 間違えた問題だけ復習</button>
+      <button class="result-btn secondary" onclick="startQuiz()">🔄 同じ設定でもう一度</button>
+      <button class="result-btn tertiary" onclick="showQuizStart()">⚙️ 設定に戻る</button>
+    </div>
+  </div>
+</div><!-- /quizScreen -->
+
+<!-- ===== FLASH SCREEN ===== -->
+<div id="flashScreen">
+  <div class="progress-area">
+    <div class="progress-top">
+      <span id="progressLabel">学習中...</span>
+      <span id="progressPct">0%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+  </div>
+
+  <div id="cardArea" class="card-area" onclick="flipCard()">
+    <div class="card-inner" id="cardInner">
+      <div class="card-face card-front" id="cardFront">
+        <div><span class="card-cat-tag" id="frontCat">カテゴリ</span></div>
+        <div class="card-term">
+          <div class="term-kanji" id="termKanji">-</div>
+          <div class="term-reading" id="termReading">-</div>
+        </div>
+        <div class="card-hint">カードをタップして意味を確認 <span class="flip-icon">↕</span></div>
+      </div>
+      <div class="card-face card-back" id="cardBack">
+        <div>
+          <span class="back-cat-tag" id="backCat">カテゴリ</span>
+          <div class="back-term" id="backTerm">-</div>
+        </div>
+        <div>
+          <div class="back-def-label">🇯🇵 日本語</div>
+          <div class="back-def-ja" id="defJa">-</div>
+          <div id="backIdSection">
+            <div class="back-def-label">🇮🇩 Bahasa Indonesia</div>
+            <div class="back-def-id">
+              <span class="id-lang">Terjemahan</span>
+              <span id="defId">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn btn-prev" onclick="prevCard()">‹</button>
+    <div class="card-num" id="cardNum">- / -</div>
+    <button class="ctrl-btn btn-next" onclick="nextCard()">›</button>
+  </div>
+
+  <div class="result-panel" id="resultPanel">
+    <h2>🎉 完了！</h2>
+    <p id="resultMsg">全カードを見終わりました。</p>
+    <button onclick="restartAll()">もう一度</button>
+  </div>
+</div><!-- /flashScreen -->
+
+</main>
+
+<div class="bottom-bar" id="bottomBarFlash">
+  <button class="bottom-btn btn-shuffle" onclick="shuffleCards()">🔀 シャッフル</button>
+  <button class="bottom-btn btn-mark" id="markBtn" onclick="toggleMark()">⭐ スター</button>
+  <button class="bottom-btn btn-reset" onclick="resetProgress()">↺ リセット</button>
+</div>
+
+<div class="bottom-bar-quiz" id="bottomBarQuiz">
+  <button class="bottom-btn btn-shuffle" onclick="showQuizStart()" style="background:var(--orange-light);color:var(--orange);">⚙️ 設定</button>
+  <button class="bottom-btn btn-reset" onclick="switchMode('flash')" style="background:var(--gray-light);color:var(--gray);">🃏 カードへ</button>
+</div>
+
+<script>
+const CARDS = [
+  // ===== 食品衛生 (45語) =====
+  { id:1,  category:"食品衛生", term:"HACCP（ハサップ）", reading:"ハサップ", definition_ja:"食品の製造工程ごとに危害要因を分析し、重要な管理点を定めて継続的に監視する衛生管理手法。食品工場では義務。", definition_id:"Sistem manajemen keamanan pangan yang menganalisis bahaya di setiap tahap produksi. Wajib diterapkan di pabrik makanan Jepang." },
+  { id:2,  category:"食品衛生", term:"危害要因", reading:"きがいよういん", definition_ja:"食品の安全を脅かす可能性がある原因。①物理的②化学的③生物的の3種類がある。", definition_id:"Bahaya yang dapat mengancam keamanan pangan. Terbagi 3: ① Fisik ② Kimia ③ Biologis." },
+  { id:3,  category:"食品衛生", term:"物理的危害要因", reading:"ぶつりてききがいよういん", definition_ja:"食品に混入する異物のこと。金属片・ガラス・骨・毛髪・プラスチックなどが例として挙げられる。", definition_id:"Bahaya fisik berupa benda asing yang masuk ke makanan, seperti serpihan logam, kaca, tulang, rambut, atau plastik." },
+  { id:4,  category:"食品衛生", term:"化学的危害要因", reading:"かがくてききがいよういん", definition_ja:"食品に含まれる有害な化学物質のこと。農薬・洗剤・添加物の過剰使用などが該当する。", definition_id:"Bahaya kimia berupa zat berbahaya dalam makanan, seperti pestisida, deterjen, atau penggunaan zat aditif berlebihan." },
+  { id:5,  category:"食品衛生", term:"生物的危害要因", reading:"せいぶつてききがいよういん", definition_ja:"細菌・ウイルス・寄生虫など微生物による危害。食中毒の原因になる。加熱・冷却・手洗いが予防に効果的。", definition_id:"Bahaya biologis dari bakteri, virus, atau parasit yang dapat menyebabkan keracunan makanan. Pencegahannya dengan pemanasan, pendinginan, dan cuci tangan." },
+  { id:6,  category:"食品衛生", term:"一般衛生管理", reading:"いっぱんえいせいかんり", definition_ja:"HACCPを支える基本的な衛生管理。施設の清掃、手洗い、健康管理、原材料の管理などが含まれる。", definition_id:"Manajemen higienitas dasar yang mendukung HACCP. Meliputi kebersihan fasilitas, cuci tangan, pemantauan kesehatan, dan manajemen bahan baku." },
+  { id:7,  category:"食品衛生", term:"５S（ファイブエス）", reading:"ごえす", definition_ja:"①整理②整頓③清掃④清潔⑤しつけ。職場の基本ルール。", definition_id:"5 aturan dasar tempat kerja: ① Seiri ② Seiton ③ Seisō ④ Seiketsu ⑤ Shitsuke." },
+  { id:8,  category:"食品衛生", term:"重要管理点（CCP）", reading:"じゅうようかんりてん", definition_ja:"HACCPで危害を防止・除去するために特に管理が必要な工程。加熱温度・時間の管理などが例。", definition_id:"Critical Control Point (CCP) dalam HACCP — tahap yang sangat penting untuk mencegah atau menghilangkan bahaya." },
+  { id:9,  category:"食品衛生", term:"交差汚染", reading:"こうさおせん", definition_ja:"生の食材の菌が調理済みの食品や器具に移ること。まな板・手を通じて起こりやすい。", definition_id:"Kontaminasi silang dari bahan mentah ke makanan yang sudah dimasak atau peralatan bersih." },
+  { id:10, category:"食品衛生", term:"食中毒", reading:"しょくちゅうどく", definition_ja:"有害な細菌・ウイルス・毒素が含まれた食品を食べることで起こる病気。腹痛・下痢・嘔吐などの症状が出る。", definition_id:"Keracunan makanan yang disebabkan oleh bakteri, virus, atau racun. Gejala: sakit perut, diare, dan muntah." },
+  { id:11, category:"食品衛生", term:"手洗い", reading:"てあらい", definition_ja:"食品衛生の基本。作業前・トイレ後・生の食材を触った後に必ず行う。石鹸で30秒以上。", definition_id:"Dasar higienitas pangan. Wajib dilakukan sebelum bekerja, setelah ke toilet, setelah menyentuh bahan mentah. Sabun minimal 30 detik." },
+  { id:12, category:"食品衛生", term:"冷蔵・冷凍管理", reading:"れいぞう・れいとうかんり", definition_ja:"細菌の増殖を防ぐため食品を適切な温度で保存すること。冷蔵は10℃以下、冷凍は-15℃以下が目安。", definition_id:"Penyimpanan makanan pada suhu tepat untuk mencegah bakteri. Kulkas ≤10°C, freezer ≤-15°C." },
+  { id:13, category:"食品衛生", term:"アレルゲン", reading:"あれるげん", definition_ja:"食物アレルギーを引き起こす原因物質。卵・乳・小麦・えび・かになど。表示・管理が義務。", definition_id:"Zat penyebab alergi makanan: telur, susu, gandum, udang, kepiting, dll. Wajib dicantumkan pada label produk." },
+  { id:14, category:"食品衛生", term:"殺菌・消毒", reading:"さっきん・しょうどく", definition_ja:"細菌・ウイルスを死滅・減少させること。加熱（75℃以上・1分間）や次亜塩素酸ナトリウム液などを使う。", definition_id:"Membunuh atau mengurangi bakteri dan virus. Bisa dengan pemanasan (≥75°C, 1 menit) atau larutan natrium hipoklorit." },
+  { id:15, category:"食品衛生", term:"異物混入", reading:"いぶつこんにゅう", definition_ja:"食品に本来入っていてはいけないものが混ざること。発見した場合はすぐ上司に報告し製品を隔離する。", definition_id:"Kontaminasi benda asing dalam makanan. Jika ditemukan, segera laporkan ke atasan dan isolasi produk." },
+  { id:16, category:"食品衛生", term:"原材料管理", reading:"げんざいりょうかんり", definition_ja:"仕入れた原材料の品質・鮮度・保存状態を確認・記録すること。先入れ先出し（FIFO）が基本。", definition_id:"Pengecekan dan pencatatan kualitas bahan baku. Prinsip FIFO (First In First Out) adalah standar dasarnya." },
+  { id:17, category:"食品衛生", term:"記録・文書管理", reading:"きろく・ぶんしょかんり", definition_ja:"HACCPでは管理基準の測定結果や改善措置を記録することが義務。問題が起きたときの証拠になる。", definition_id:"Dalam HACCP, wajib mencatat hasil pengukuran dan tindakan perbaikan. Rekaman ini menjadi bukti jika terjadi masalah." },
+  { id:18, category:"食品衛生", term:"管理基準（CL）", reading:"かんりきじゅん", definition_ja:"CCPで危害を防止するために設定する基準値。例：「中心温度75℃以上・1分間」など。", definition_id:"Critical Limit (CL) — nilai batas yang ditetapkan di CCP. Contoh: 'Suhu pusat ≥75°C selama 1 menit'." },
+  { id:19, category:"食品衛生", term:"逸脱・改善措置", reading:"いつだつ・かいぜんそち", definition_ja:"管理基準を満たせなかった場合（逸脱）に、原因を調べて是正する行動（改善措置）をとること。", definition_id:"Penyimpangan (deviation) dan tindakan perbaikan (corrective action) untuk menyelidiki dan memperbaiki penyebab masalah." },
+  { id:20, category:"食品衛生", term:"作業者の衛生管理", reading:"さぎょうしゃのえいせいかんり", definition_ja:"健康状態の確認（下痢・発熱・傷がないか）、清潔な作業服・帽子・手袋の着用など。", definition_id:"Pemantauan kondisi kesehatan pekerja dan penggunaan seragam kerja, topi, dan sarung tangan yang bersih." },
+  { id:21, category:"食品衛生", term:"ノロウイルス", reading:"のろういるす", definition_ja:"ウイルス性食中毒の代表的な原因。感染力が強く少量で発症する。85℃1分以上の加熱と十分な手洗いで予防する。", definition_id:"Penyebab utama keracunan makanan viral. Sangat menular. Dicegah dengan pemanasan ≥85°C selama 1 menit dan cuci tangan." },
+  { id:22, category:"食品衛生", term:"サルモネラ菌", reading:"さるもねらきん", definition_ja:"生の卵・鶏肉などに存在する食中毒菌。75℃1分以上の加熱で死滅する。冷蔵保存と加熱が予防の基本。", definition_id:"Bakteri penyebab keracunan makanan pada telur/ayam mentah. Mati dengan pemanasan ≥75°C selama 1 menit." },
+  { id:23, category:"食品衛生", term:"腸管出血性大腸菌（O157）", reading:"ちょうかんしゅっけつせいだいちょうきん", definition_ja:"強力な毒素を産生する大腸菌。牛肉の生食や汚染された野菜が主な感染源。少量でも重篤な症状を引き起こす。", definition_id:"E. coli penghasil racun kuat. Sumber utama: daging sapi mentah dan sayuran terkontaminasi. Sangat berbahaya meski dalam jumlah kecil." },
+  { id:24, category:"食品衛生", term:"黄色ブドウ球菌", reading:"おうしょくぶどうきゅうきん", definition_ja:"手や皮膚の傷に存在する細菌。産生する毒素は加熱しても分解されないため、傷のある手での調理は厳禁。", definition_id:"Bakteri pada luka kulit. Racunnya tidak hilang meski dipanaskan. Dilarang memasak dengan tangan yang terluka." },
+  { id:25, category:"食品衛生", term:"食品添加物", reading:"しょくひんてんかぶつ", definition_ja:"保存性の向上・風味・色の改善などのために使う物質。法律で許可されたもののみ、定められた量で使用できる。", definition_id:"Zat yang digunakan untuk meningkatkan keawetan, rasa, atau warna makanan. Hanya boleh menggunakan yang diizinkan oleh hukum." },
+  { id:26, category:"食品衛生", term:"冷凍食品の解凍", reading:"れいとうしょくひんのかいとう", definition_ja:"流水解凍または冷蔵庫解凍が原則。室温放置は細菌が増殖するため危険。解凍後の再凍結は禁止。", definition_id:"Cara mencairkan beku yang benar: air mengalir atau kulkas. Jangan dibiarkan di suhu ruang. Pembekuan ulang dilarang." },
+  { id:27, category:"食品衛生", term:"食品衛生法", reading:"しょくひんえいせいほう", definition_ja:"食品の安全確保を目的とした基本法律。HACCPの義務化・食品表示・添加物の規制なども定めている。", definition_id:"Undang-undang dasar keamanan pangan. Mengatur kewajiban HACCP, pelabelan pangan, dan regulasi zat aditif." },
+  { id:28, category:"食品衛生", term:"モニタリング", reading:"もにたりんぐ", definition_ja:"CCPで管理基準の値（温度・時間など）を継続的に測定・観察すること。記録の作成は義務。", definition_id:"Pengukuran dan pemantauan nilai (suhu, waktu, dll.) di CCP secara berkelanjutan. Pencatatan wajib dilakukan." },
+  { id:29, category:"食品衛生", term:"検証（ベリフィケーション）", reading:"けんしょう", definition_ja:"HACCPシステムが正しく機能しているか定期的に確認する活動。記録の確認・試験・見直しを含む。", definition_id:"Kegiatan untuk memastikan sistem HACCP berfungsi dengan benar secara berkala. Mencakup peninjauan catatan dan pengujian." },
+  { id:30, category:"食品衛生", term:"内部監査", reading:"ないぶかんさ", definition_ja:"自社のHACCPや衛生管理システムが適切に実施されているか内部のスタッフが確認する活動。", definition_id:"Kegiatan internal untuk memastikan HACCP dan sistem manajemen higienitas dilaksanakan dengan benar." },
+  { id:31, category:"食品衛生", term:"食中毒予防の三原則", reading:"しょくちゅうどくよぼうのさんげんそく", definition_ja:"①菌をつけない（清潔）②菌を増やさない（冷却・迅速）③菌を殺す（加熱）。食中毒予防の基本。", definition_id:"3 prinsip mencegah keracunan makanan: ① Jangan biarkan bakteri menempel ② Jangan biarkan berkembang biak ③ Bunuh bakteri dengan memanaskan." },
+  { id:32, category:"食品衛生", term:"二次汚染", reading:"にじおせん", definition_ja:"汚染された食品・器具・手などを介して、他の食品や清潔な器具へ菌が広がること。", definition_id:"Penyebaran bakteri dari makanan/peralatan/tangan yang terkontaminasi ke makanan atau peralatan bersih lainnya." },
+  { id:33, category:"食品衛生", term:"食品衛生責任者", reading:"しょくひんえいせいせきにんしゃ", definition_ja:"食品営業施設において衛生管理の責任を持つ人。各施設に1名の設置が法律で義務付けられている。", definition_id:"Penanggung jawab manajemen higienitas di fasilitas usaha pangan. Diwajibkan 1 orang per fasilitas oleh hukum." },
+  { id:34, category:"食品衛生", term:"水分活性（Aw）", reading:"すいぶんかっせい", definition_ja:"食品中の細菌が利用できる水分量の指標。値が低いほど細菌が増えにくく保存性が高い。乾燥食品は低い。", definition_id:"Indikator jumlah air yang tersedia bagi bakteri dalam makanan. Makin rendah, makin sulit bakteri berkembang." },
+  { id:35, category:"食品衛生", term:"pH管理", reading:"ぴーえいちかんり", definition_ja:"食品の酸性・アルカリ性の度合いを管理すること。pH4.6以下では多くの細菌が増殖できない。酢・レモンなどで調整。", definition_id:"Pengelolaan tingkat keasaman makanan. pH ≤4.6 menghambat pertumbuhan banyak bakteri. Contoh: cuka, lemon." },
+  { id:36, category:"食品衛生", term:"コールドチェーン", reading:"こーるどちぇーん", definition_ja:"食品を生産から消費者に届くまでの全工程で低温を維持する管理体制。品質・安全性の確保に重要。", definition_id:"Sistem menjaga suhu rendah sepanjang rantai dari produksi hingga ke konsumen. Penting untuk kualitas dan keamanan." },
+  { id:37, category:"食品衛生", term:"予防措置", reading:"よぼうそち", definition_ja:"問題が発生する前に事前に対策を講じること。HACCPの基本的な考え方で、事後対応より優先される。", definition_id:"Tindakan yang diambil sebelum masalah terjadi. Prinsip dasar HACCP — lebih utama dari penanganan setelah masalah muncul." },
+  { id:38, category:"食品衛生", term:"腸炎ビブリオ", reading:"ちょうえんびぶりお", definition_ja:"海の魚介類に多い食中毒菌。真水で洗浄・十分な加熱・低温保存が予防の基本。夏場に多く発生する。", definition_id:"Bakteri pada makanan laut. Dicegah dengan mencuci air tawar, memanaskan cukup, dan menyimpan di suhu rendah." },
+  { id:39, category:"食品衛生", term:"食品検査", reading:"しょくひんけんさ", definition_ja:"製品の安全性・品質を確認するための微生物検査・理化学検査など。出荷前の確認として重要。", definition_id:"Pengujian produk untuk memastikan keamanan dan kualitas, termasuk uji mikrobiologi dan uji fisikokimia." },
+  { id:40, category:"食品衛生", term:"不適合品の隔離", reading:"ふてきごうひんのかくり", definition_ja:"品質や衛生の基準を満たさない製品を通常製品と分けて管理し、誤って出荷されないようにすること。", definition_id:"Memisahkan produk yang tidak memenuhi standar dari produk normal untuk mencegah pengiriman yang salah." },
+  { id:41, category:"食品衛生", term:"表示・ラベル管理", reading:"ひょうじ・らべるかんり", definition_ja:"食品表示法に基づき、原材料名・アレルゲン・期限・保存方法などを正確にラベルに表示して管理すること。", definition_id:"Pengelolaan label sesuai hukum pelabelan pangan: nama bahan, alergen, tanggal kedaluwarsa, cara penyimpanan." },
+  { id:42, category:"食品衛生", term:"洗剤・消毒剤の管理", reading:"せんざい・しょうどくざいのかんり", definition_ja:"食品用と非食品用の洗剤を分けて保管し、正しい濃度・用途で使用すること。誤用は化学的危害の原因になる。", definition_id:"Menyimpan deterjen untuk pangan dan non-pangan secara terpisah. Gunakan pada konsentrasi dan tujuan yang benar." },
+  { id:43, category:"食品衛生", term:"施設の衛生管理", reading:"しせつのえいせいかんり", definition_ja:"天井・壁・床・排水溝などの定期的な清掃と、害虫・ネズミの侵入防止対策を含む施設全体の衛生維持。", definition_id:"Pemeliharaan kebersihan seluruh fasilitas: langit-langit, dinding, lantai, saluran air, dan pencegahan hama/tikus." },
+  { id:44, category:"食品衛生", term:"製品回収手順", reading:"せいひんかいしゅうてじゅん", definition_ja:"食品に問題が発覚した際に市場から迅速に製品を回収するための事前に準備された手順書（リコール手順）。", definition_id:"Prosedur yang disiapkan sebelumnya untuk menarik produk dari pasar secara cepat jika ditemukan masalah (recall)." },
+  { id:45, category:"食品衛生", term:"食物アレルギー", reading:"しょくもつあれるぎー", definition_ja:"特定の食品を摂取することで免疫が過剰反応し、じんましん・呼吸困難などの症状が起きる状態。重篤化する危険がある。", definition_id:"Reaksi imun berlebihan terhadap makanan tertentu. Gejala: gatal-gatal, sesak napas. Bisa mengancam jiwa." },
+
+  // ===== 労働安全 (35語) =====
+  { id:46, category:"労働安全", term:"労働災害", reading:"ろうどうさいがい", definition_ja:"仕事中に起きたけがや病気。食品工場では転倒・切れ・やけど・機械への巻き込まれなどが多い。", definition_id:"Kecelakaan atau penyakit saat bekerja. Di pabrik makanan yang umum: tergelincir, terluka, luka bakar, terjepit mesin." },
+  { id:47, category:"労働安全", term:"ヒヤリハット", reading:"ひやりはっと", definition_ja:"事故には至らなかったが「ヒヤリ」「ハット」した出来事。報告・共有することで大きな事故を防ぐ。", definition_id:"Kejadian hampir celaka. Dengan melaporkan dan berbagi, kecelakaan besar dapat dicegah." },
+  { id:48, category:"労働安全", term:"KYT（危険予知訓練）", reading:"けいわいてぃー", definition_ja:"作業前に危険を話し合い、事故を予防するための訓練。KY=危険予知の略。", definition_id:"Pelatihan prediksi bahaya sebelum bekerja untuk mencegah kecelakaan." },
+  { id:49, category:"労働安全", term:"転倒災害", reading:"てんとうさいがい", definition_ja:"床が濡れていたり油で滑りやすい状態での転倒。食品工場で最も多い災害の一つ。防滑靴の着用が有効。", definition_id:"Kecelakaan tergelincir akibat lantai basah/berminyak. Sepatu anti-selip sangat efektif." },
+  { id:50, category:"労働安全", term:"はさまれ・巻き込まれ", reading:"はさまれ・まきこまれ", definition_ja:"機械の回転部分に体や衣服が巻き込まれる事故。カバーの取り外しは厳禁。必ずカバーを取り付けて稼働させる。", definition_id:"Kecelakaan terjepit pada bagian mesin yang berputar. Dilarang melepas penutup mesin." },
+  { id:51, category:"労働安全", term:"切れ・こすれ災害", reading:"きれ・こすれさいがい", definition_ja:"刃物・機械の刃・缶の切り口などで切れたり擦れる事故。保護手袋の着用が有効。", definition_id:"Kecelakaan terluka atau tergores akibat pisau atau tepi tajam. Sarung tangan pelindung sangat efektif." },
+  { id:52, category:"労働安全", term:"やけど災害", reading:"やけどさいがい", definition_ja:"高温の食品・湯・蒸気・加熱機器に触れることで起こる熱傷。耐熱手袋や保護具の着用が重要。", definition_id:"Luka bakar akibat menyentuh makanan panas, air mendidih, uap, atau peralatan pemanas." },
+  { id:53, category:"労働安全", term:"腰痛災害", reading:"ようつうさいがい", definition_ja:"重いものを持ち上げたり同じ姿勢を続けることで腰を痛める災害。正しい持ち方・補助器具の活用が大切。", definition_id:"Cedera punggung bawah akibat mengangkat benda berat atau postur yang sama terlalu lama." },
+  { id:54, category:"労働安全", term:"熱中症", reading:"ねっちゅうしょう", definition_ja:"高温・多湿な環境で体温調節ができなくなる状態。水分補給・休憩・換気が予防に重要。", definition_id:"Serangan panas akibat lingkungan panas dan lembab. Pencegahan: minum air, istirahat, dan ventilasi yang baik." },
+  { id:55, category:"労働安全", term:"作業手順書", reading:"さぎょうてじゅんしょ", definition_ja:"作業を安全・正確に行うための手順を文書化したもの。必ず守ること。勝手に変更してはいけない。", definition_id:"Dokumen prosedur kerja yang aman dan akurat. Wajib diikuti dan tidak boleh diubah sendiri." },
+  { id:56, category:"労働安全", term:"保護具（PPE）", reading:"ほごぐ", definition_ja:"危険から身体を守るための装備。保護手袋・安全靴・ヘルメット・耳栓・防塵マスクなど。", definition_id:"Alat Pelindung Diri (APD): sarung tangan, sepatu safety, helm, penutup telinga, masker debu, dll." },
+  { id:57, category:"労働安全", term:"異常事態の報告", reading:"いじょうじたいのほうこく", definition_ja:"機械の異常・火災・事故などが起きたときは、すぐに作業を止め上司に報告すること。", definition_id:"Jika terjadi kerusakan mesin, kebakaran, atau kecelakaan, segera hentikan pekerjaan dan laporkan ke atasan." },
+  { id:58, category:"労働安全", term:"落下災害", reading:"らっかさいがい", definition_ja:"高所からの物の落下や、人が高所から落ちる事故。足場の確認・安全帯の着用が必要。", definition_id:"Kecelakaan akibat benda jatuh dari ketinggian atau orang terjatuh. Perlu memastikan pijakan aman dan memakai sabuk pengaman." },
+  { id:59, category:"労働安全", term:"労働安全衛生法", reading:"ろうどうあんぜんえいせいほう", definition_ja:"労働者の安全と健康を守るための基本法律。事業者に安全管理・健康診断・教育の実施を義務付けている。", definition_id:"Undang-undang dasar keselamatan dan kesehatan kerja. Mewajibkan pengusaha mengelola keselamatan, kesehatan, dan pelatihan." },
+  { id:60, category:"労働安全", term:"リスクアセスメント", reading:"りすくあせすめんと", definition_ja:"作業に潜む危険性を洗い出し、リスクの大きさを評価して優先的に対策を決めるプロセス。", definition_id:"Proses mengidentifikasi bahaya, menilai besarnya risiko, dan menentukan tindakan pencegahan secara prioritas." },
+  { id:61, category:"労働安全", term:"安全衛生教育", reading:"あんぜんえいせいきょういく", definition_ja:"採用時・作業内容の変更時などに実施が義務付けられた安全・衛生に関する教育訓練。", definition_id:"Pelatihan keselamatan dan kesehatan yang wajib diberikan saat rekrutmen atau perubahan pekerjaan." },
+  { id:62, category:"労働安全", term:"安全標識", reading:"あんぜんひょうしき", definition_ja:"危険・警告・禁止・指示などを視覚的に示す表示。色と形で意味が分かるように統一されている。", definition_id:"Rambu yang menunjukkan bahaya, peringatan, larangan, atau instruksi secara visual. Warna dan bentuk sudah distandarkan." },
+  { id:63, category:"労働安全", term:"緊急避難・避難訓練", reading:"きんきゅうひなん・ひなんくんれん", definition_ja:"火災・地震などの緊急時に安全に避難するための訓練。避難経路の確認と定期的な訓練が重要。", definition_id:"Latihan evakuasi darurat saat kebakaran atau gempa. Penting untuk memastikan jalur evakuasi dan melakukan latihan rutin." },
+  { id:64, category:"労働安全", term:"応急処置（救急）", reading:"おうきゅうしょち", definition_ja:"事故・負傷が起きたときの初期対応。出血の止め方・AEDの使い方・心肺蘇生法の習得が重要。", definition_id:"Penanganan awal saat terjadi kecelakaan. Penting untuk belajar cara menghentikan perdarahan, AED, dan CPR." },
+  { id:65, category:"労働安全", term:"定期健康診断", reading:"ていきけんこうしんだん", definition_ja:"事業者は年1回以上、労働者の健康診断を実施する義務がある。結果に応じて就業上の配慮が必要。", definition_id:"Pemeriksaan kesehatan tahunan yang wajib dilakukan oleh pengusaha. Hasilnya digunakan untuk penyesuaian tugas." },
+  { id:66, category:"労働安全", term:"職場巡視", reading:"しょくばじゅんし", definition_ja:"管理者・安全衛生担当者が定期的に現場を巡回して危険箇所を発見・改善する活動。", definition_id:"Kegiatan manajemen berkeliling tempat kerja secara rutin untuk menemukan dan memperbaiki titik-titik bahaya." },
+  { id:67, category:"労働安全", term:"機械の安全装置", reading:"きかいのあんぜんそうち", definition_ja:"危険な機械に設けるカバー・停止スイッチ・インターロックなどの装置。取り外しや無効化は厳禁。", definition_id:"Perangkat keselamatan mesin: penutup, saklar penghenti, interlock, dll. Dilarang melepas atau menonaktifkan." },
+  { id:68, category:"労働安全", term:"化学物質管理", reading:"かがくぶっしつかんり", definition_ja:"工場で使用する洗剤・消毒剤・潤滑剤などの危険化学物質を適切に保管・使用・廃棄する管理。", definition_id:"Pengelolaan bahan kimia berbahaya (deterjen, disinfektan, pelumas) secara aman: penyimpanan, penggunaan, dan pembuangan." },
+  { id:69, category:"労働安全", term:"騒音障害", reading:"そうおんしょうがい", definition_ja:"長時間の大きな騒音にさらされることで起こる聴力低下。耳栓などの保護具着用と作業時間の管理が必要。", definition_id:"Gangguan pendengaran akibat paparan kebisingan jangka panjang. Perlu memakai penutup telinga dan membatasi waktu kerja." },
+  { id:70, category:"労働安全", term:"粉塵対策", reading:"ふんじんたいさく", definition_ja:"小麦粉・粉末原料などの粉塵による肺疾患（じん肺）を防ぐための換気・防塵マスクの着用。", definition_id:"Tindakan mencegah penyakit paru akibat debu tepung/bubuk: ventilasi yang baik dan pemakaian masker anti-debu." },
+  { id:71, category:"労働安全", term:"作業環境測定", reading:"さぎょうかんきょうそくてい", definition_ja:"職場の温度・湿度・騒音・粉塵濃度などを定期的に測定し、快適で安全な作業環境を維持する活動。", definition_id:"Pengukuran berkala suhu, kelembaban, kebisingan, dan konsentrasi debu di tempat kerja untuk menjaga kondisi aman." },
+  { id:72, category:"労働安全", term:"転倒防止対策", reading:"てんとうぼうしたいさく", definition_ja:"防滑マット・滑り止め塗装・床の水分管理・安全靴の着用・整理整頓など、転倒を防ぐ複数の対策の組み合わせ。", definition_id:"Kombinasi tindakan pencegahan tergelincir: matras anti-selip, cat lantai, manajemen air, sepatu keselamatan, dan kerapian." },
+  { id:73, category:"労働安全", term:"電気安全", reading:"でんきあんぜん", definition_ja:"濡れた手での機器操作禁止・コードの損傷確認・漏電ブレーカーの設置など。感電は命に関わる危険。", definition_id:"Larangan mengoperasikan peralatan dengan tangan basah, cek kerusakan kabel, dan pasang pemutus arus bocor. Sengatan listrik bisa fatal." },
+  { id:74, category:"労働安全", term:"熱中症の予防対策", reading:"ねっちゅうしょうのよぼうたいさく", definition_ja:"WBGT（暑さ指数）の管理、水分・塩分の補給、適切な休憩の実施、換気・冷却設備の活用。", definition_id:"Pengelolaan WBGT (indeks panas), asupan air dan garam, istirahat cukup, serta penggunaan ventilasi dan pendingin." },
+  { id:75, category:"労働安全", term:"腰痛予防", reading:"ようつうよぼう", definition_ja:"重いものを持ち上げるときは膝を曲げて腰への負担を減らす。補助器具の活用・適切な休憩・体操が重要。", definition_id:"Menekuk lutut saat mengangkat beban berat. Gunakan alat bantu, istirahat yang cukup, dan lakukan peregangan." },
+  { id:76, category:"労働安全", term:"ヒヤリハット報告書", reading:"ひやりはっとほうこくしょ", definition_ja:"ヒヤリハット体験を記録・共有するための書類。全員で情報共有することで職場全体の安全意識を高める。", definition_id:"Formulir pencatatan kejadian hampir celaka. Berbagi informasi dengan semua orang meningkatkan kesadaran keselamatan." },
+  { id:77, category:"労働安全", term:"安全衛生委員会", reading:"あんぜんえいせいいいんかい", definition_ja:"事業者と労働者が協力して職場の安全衛生を管理する委員会。労働者50人以上の事業場に設置義務がある。", definition_id:"Komite yang dibentuk pengusaha dan pekerja untuk mengelola keselamatan dan kesehatan kerja bersama. Wajib untuk 50+ pekerja." },
+  { id:78, category:"労働安全", term:"酸素欠乏危険作業", reading:"さんそけつぼうきけんさぎょう", definition_ja:"タンク内・密閉空間での作業は酸素濃度が低下する危険がある。作業前に測定が義務で特別教育が必要。", definition_id:"Pekerjaan di dalam tangki/ruang tertutup berisiko kekurangan oksigen. Wajib diukur sebelumnya dan perlu pelatihan khusus." },
+  { id:79, category:"労働安全", term:"新入社員安全教育", reading:"しんにゅうしゃいんあんぜんきょういく", definition_ja:"入社時に行う安全作業の基本教育。業務内容・危険箇所・緊急時の対応・保護具の使い方などを学ぶ。", definition_id:"Pelatihan keselamatan dasar saat masuk kerja: isi pekerjaan, titik bahaya, respons darurat, dan cara pakai APD." },
+  { id:80, category:"労働安全", term:"重大災害・労災報告", reading:"じゅうだいさいがい・ろうさいほうこく", definition_ja:"死亡や4日以上の休業を伴う重大な労働災害は、労働基準監督署への報告が義務付けられている。", definition_id:"Kecelakaan kerja yang menyebabkan kematian atau absen ≥4 hari wajib dilaporkan ke Pengawas Ketenagakerjaan." },
+
+  // ===== 製造知識 (40語) =====
+  { id:81,  category:"製造知識", term:"製造工程管理", reading:"せいぞうこうていかんり", definition_ja:"製品を決められた手順・基準どおりに製造するための管理。品質・安全性・効率を保つ。", definition_id:"Pengelolaan proses produksi sesuai prosedur dan standar untuk menjaga kualitas, keamanan, dan efisiensi." },
+  { id:82,  category:"製造知識", term:"品質管理（QC）", reading:"ひんしつかんり", definition_ja:"製品が決められた品質基準を満たしているかを確認・管理すること。検査・測定・記録が重要。", definition_id:"Quality Control (QC) — memastikan produk memenuhi standar kualitas melalui inspeksi, pengukuran, dan pencatatan." },
+  { id:83,  category:"製造知識", term:"先入れ先出し（FIFO）", reading:"さきいれさきだし", definition_ja:"先に入ってきた原材料・製品を先に使う・出荷する方法。食品の鮮度・品質を保つための基本。", definition_id:"FIFO (First In First Out) — bahan yang pertama masuk, pertama digunakan/dikirim. Prinsip dasar menjaga kesegaran pangan." },
+  { id:84,  category:"製造知識", term:"トレーサビリティ", reading:"とれーさびりてぃ", definition_ja:"食品の生産・加工・流通の過程を追跡できること。問題が起きたときに原因を特定するために重要。", definition_id:"Kemampuan melacak proses produksi, pengolahan, dan distribusi pangan untuk mengidentifikasi masalah." },
+  { id:85,  category:"製造知識", term:"賞味期限・消費期限", reading:"しょうみきげん・しょうひきげん", definition_ja:"賞味期限：おいしく食べられる期限。消費期限：安全に食べられる期限（過ぎたら食べない）。", definition_id:"賞味期限 = 'best before'. 消費期限 = 'use by' (jangan dimakan setelah tanggal ini)." },
+  { id:86,  category:"製造知識", term:"洗浄・消毒の手順", reading:"せんじょう・しょうどくのてじゅん", definition_ja:"①水洗い→②洗剤で洗う→③すすぐ→④消毒→⑤乾燥。順番を守ることが重要。", definition_id:"① Bilas air → ② Cuci deterjen → ③ Bilas → ④ Desinfeksi → ⑤ Keringkan. Urutannya sangat penting." },
+  { id:87,  category:"製造知識", term:"作業服・帽子・手袋", reading:"さぎょうふく・ぼうし・てぶくろ", definition_ja:"食品への毛髪・汚れの混入を防ぐための服装。清潔なものを毎日着用する。", definition_id:"Pakaian kerja, topi, dan sarung tangan untuk mencegah rambut/kotoran masuk ke makanan. Dipakai bersih setiap hari." },
+  { id:88,  category:"製造知識", term:"エアシャワー", reading:"えあしゃわー", definition_ja:"工場の清潔ゾーンに入る前に体についたほこり・毛髪などを強風で吹き飛ばす装置。", definition_id:"Perangkat yang menggunakan angin kencang untuk membersihkan debu dan rambut sebelum memasuki area bersih pabrik." },
+  { id:89,  category:"製造知識", term:"金属検出機", reading:"きんぞくけんしゅつき", definition_ja:"製品に金属が混入していないかを検査する機械。物理的危害要因を防止するための重要な設備。", definition_id:"Mesin untuk mendeteksi logam yang tercampur dalam produk. Peralatan penting mencegah bahaya fisik." },
+  { id:90,  category:"製造知識", term:"温度管理", reading:"おんどかんり", definition_ja:"食品の製造・保存・輸送において適切な温度を維持すること。細菌の増殖を防ぐために重要。", definition_id:"Menjaga suhu yang tepat dalam produksi, penyimpanan, dan pengiriman makanan untuk mencegah pertumbuhan bakteri." },
+  { id:91,  category:"製造知識", term:"クレーム対応", reading:"くれーむたいおう", definition_ja:"消費者から苦情があった場合の対応。事実を確認し上司に報告して原因を調査・再発防止に努める。", definition_id:"Penanganan keluhan konsumen. Verifikasi fakta, laporkan ke atasan, selidiki penyebab, dan cegah agar tidak terulang." },
+  { id:92,  category:"製造知識", term:"廃棄・リコール", reading:"はいき・りこーる", definition_ja:"基準を満たさない製品の廃棄。問題のある製品を市場から回収することをリコールという。", definition_id:"Pembuangan produk yang tidak memenuhi standar. Penarikan produk bermasalah dari pasar disebut recall." },
+  { id:93,  category:"製造知識", term:"ゾーニング", reading:"ぞーにんぐ", definition_ja:"工場内を清潔ゾーン・一般ゾーンなどに区分けすること。汚染を防止するための重要な設計。", definition_id:"Pembagian area pabrik menjadi zona bersih dan zona umum untuk mencegah kontaminasi." },
+  { id:94,  category:"製造知識", term:"ロット番号", reading:"ろっとばんごう", definition_ja:"同じ条件で製造された製品のグループを識別する番号。問題が起きたときの追跡に使う。", definition_id:"Nomor yang mengidentifikasi kelompok produk yang dibuat dalam kondisi sama. Digunakan untuk pelacakan jika ada masalah." },
+  { id:95,  category:"製造知識", term:"衛生的な服装", reading:"えいせいてきなふくそう", definition_ja:"工場に入る前に作業服・帽子・マスクを正しく着用し、時計・指輪などの装飾品を外す。", definition_id:"Sebelum masuk pabrik, kenakan seragam, topi, dan masker dengan benar, serta lepas jam tangan dan perhiasan." },
+  { id:96,  category:"製造知識", term:"防虫・防鼠管理", reading:"ぼうちゅう・ぼうそかんり", definition_ja:"虫（ゴキブリなど）やネズミが工場に侵入しないよう管理すること。扉・窓の隙間をふさぐなど。", definition_id:"Pengendalian serangga dan tikus agar tidak masuk pabrik. Caranya dengan menutup celah di pintu dan jendela." },
+  { id:97,  category:"製造知識", term:"帳票・チェックリスト", reading:"ちょうひょう・ちぇっくりすと", definition_ja:"作業の確認事項や測定値を記録するための用紙や表。HACCPの記録に欠かせない。", definition_id:"Formulir atau tabel untuk mencatat item yang perlu diperiksa dan nilai pengukuran. Tidak bisa dipisahkan dari HACCP." },
+  { id:98,  category:"製造知識", term:"製造記録", reading:"せいぞうきろく", definition_ja:"製造日時・担当者・使用原材料・製造数量などを記録した文書。トレーサビリティの基礎となる重要な記録。", definition_id:"Dokumen yang mencatat tanggal/waktu produksi, penanggung jawab, bahan baku, dan jumlah produksi. Dasar traceability." },
+  { id:99,  category:"製造知識", term:"受入検査", reading:"うけいれけんさ", definition_ja:"仕入れた原材料が品質・衛生の基準を満たしているか確認する検査。外観・温度・賞味期限などを確認する。", definition_id:"Inspeksi bahan baku yang diterima untuk memastikan kualitas dan higienitas: tampilan, suhu, tanggal kedaluwarsa, dll." },
+  { id:100, category:"製造知識", term:"工程管理基準", reading:"こうていかんりきじゅん", definition_ja:"各製造工程で守るべき温度・時間・量などの数値的な基準値。逸脱した場合は記録と改善措置が必要。", definition_id:"Nilai standar (suhu, waktu, jumlah) yang harus dipatuhi di setiap tahap produksi. Penyimpangan harus dicatat dan diperbaiki." },
+  { id:101, category:"製造知識", term:"異物排除装置", reading:"いぶつはいじょそうち", definition_ja:"金属検出機・X線検査機・フィルター・磁石など、製品中の異物を自動的に検出・除去する装置の総称。", definition_id:"Perangkat yang secara otomatis mendeteksi dan membuang benda asing: detektor logam, X-ray, filter, magnet, dll." },
+  { id:102, category:"製造知識", term:"重量選別機", reading:"じゅうりょうせんべつき", definition_ja:"製品の重量を自動測定し、規定の重量範囲外の製品を自動的に排除するウェイトチェッカーのこと。", definition_id:"Mesin yang mengukur berat produk secara otomatis dan menyingkirkan yang di luar batas berat standar." },
+  { id:103, category:"製造知識", term:"包装・梱包工程", reading:"ほうそう・こんぽうこうてい", definition_ja:"製品を袋・トレー・箱などに入れて密封し、ラベルを貼る最終工程。清潔な環境での作業と二次汚染防止が重要。", definition_id:"Proses akhir memasukkan produk ke kantong/kotak, menyegel, dan memberi label. Kebersihan dan pencegahan kontaminasi penting." },
+  { id:104, category:"製造知識", term:"設備点検・メンテナンス", reading:"せつびてんけん・めんてなんす", definition_ja:"機械・設備を定期的に点検・整備すること。故障による生産停止や品質不良・安全事故を防ぐために必要。", definition_id:"Inspeksi dan perawatan mesin/peralatan secara berkala untuk mencegah kerusakan, masalah kualitas, dan kecelakaan." },
+  { id:105, category:"製造知識", term:"校正（キャリブレーション）", reading:"こうせい", definition_ja:"温度計・計量器・圧力計などの測定機器を定期的に基準と照合し、精度が正しいことを確認すること。", definition_id:"Pemeriksaan berkala alat ukur (termometer, timbangan, dll.) dengan standar referensi untuk memastikan keakuratan." },
+  { id:106, category:"製造知識", term:"製品規格書", reading:"せいひんきかくしょ", definition_ja:"製品の品質基準（成分・外観・重量・微生物限界値など）を定めた文書。品質管理の基準となる。", definition_id:"Dokumen yang menetapkan standar kualitas produk: komposisi, tampilan, berat, batas mikroba, dll." },
+  { id:107, category:"製造知識", term:"外観検査", reading:"がいかんけんさ", definition_ja:"製品の色・形・大きさ・包装の状態・異物の有無などを目視や機器で確認する検査。", definition_id:"Pemeriksaan warna, bentuk, ukuran, kondisi kemasan, dan ada tidaknya benda asing pada produk secara visual atau alat." },
+  { id:108, category:"製造知識", term:"在庫管理", reading:"ざいこかんり", definition_ja:"原材料・半製品・完成品の保管数量・保管条件（温度・場所）を適切に管理すること。廃棄ロスの削減につながる。", definition_id:"Pengelolaan jumlah dan kondisi penyimpanan (suhu, lokasi) bahan baku, produk setengah jadi, dan produk jadi." },
+  { id:109, category:"製造知識", term:"製造ロス管理", reading:"せいぞうろすかんり", definition_ja:"不良品・廃棄量・歩留まりを記録し、ロスの原因を分析して削減するための改善活動。コスト削減に直結。", definition_id:"Mencatat dan menganalisis penyebab produk gagal/terbuang untuk mengurangi kerugian produksi dan biaya." },
+  { id:110, category:"製造知識", term:"CIP（定置洗浄）", reading:"しーあいぴー", definition_ja:"機械・配管・タンクを分解せずに、洗浄液を循環させて内部を洗浄する方法。効率的で衛生的な洗浄が可能。", definition_id:"Cleaning In Place — membersihkan bagian dalam mesin, pipa, dan tangki dengan mengalirkan cairan pembersih tanpa dibongkar." },
+  { id:111, category:"製造知識", term:"充填精度管理", reading:"じゅうてんせいどかんり", definition_ja:"製品の内容量が規定の重量・容量に合っているか管理すること。計量法に基づく基準を守る必要がある。", definition_id:"Pengelolaan untuk memastikan isi produk sesuai berat/volume standar. Harus mematuhi peraturan metrologi." },
+  { id:112, category:"製造知識", term:"食品表示法", reading:"しょくひんひょうじほう", definition_ja:"食品のラベルに記載すべき情報（名称・原材料・添加物・アレルゲン・期限・保存方法）を定めた法律。", definition_id:"Undang-undang yang mengatur informasi wajib pada label makanan: nama, bahan, aditif, alergen, kedaluwarsa, cara simpan." },
+  { id:113, category:"製造知識", term:"内部苦情処理", reading:"ないぶくじょうしょり", definition_ja:"従業員が発見した品質・衛生上の問題を社内で報告・共有し、原因を調査して再発を防ぐ仕組み。", definition_id:"Sistem internal untuk melaporkan, berbagi, dan menyelidiki masalah kualitas/higienitas yang ditemukan karyawan." },
+  { id:114, category:"製造知識", term:"製造環境モニタリング", reading:"せいぞうかんきょうもにたりんぐ", definition_ja:"製造エリアの床・壁・空気中の細菌汚染を定期的に拭き取り検査などで確認し、清潔さを維持する活動。", definition_id:"Pemantauan berkala kontaminasi bakteri di lantai, dinding, dan udara area produksi untuk menjaga kebersihan." },
+  { id:115, category:"製造知識", term:"廃棄物の分別管理", reading:"はいきぶつのぶんべつかんり", definition_ja:"一般廃棄物・産業廃棄物・食品廃棄物を分別して適切に処理する管理。環境法規制の遵守が必要。", definition_id:"Pemisahan dan pengelolaan sampah umum, industri, dan makanan secara tepat sesuai peraturan lingkungan." },
+  { id:116, category:"製造知識", term:"清潔作業区域", reading:"せいけつさぎょうくいき", definition_ja:"最終製品に直接触れる工程が行われる最も衛生管理の厳しい区域。入室には専用の服装・手洗いが必要。", definition_id:"Zona dengan higienitas tertinggi tempat produk akhir bersentuhan langsung. Perlu seragam khusus dan cuci tangan." },
+  { id:117, category:"製造知識", term:"表示検査", reading:"ひょうじけんさ", definition_ja:"出荷前にラベルの内容（成分・アレルゲン・期限・保存方法）が正確かを確認する検査。誤表示は法律違反。", definition_id:"Pemeriksaan keakuratan label (bahan, alergen, kedaluwarsa, cara simpan) sebelum pengiriman. Salah label = pelanggaran hukum." },
+  { id:118, category:"製造知識", term:"返品・不良品の管理", reading:"へんぴん・ふりょうひんのかんり", definition_ja:"返品・クレーム品は通常製品と隔離し、原因を調査した上で廃棄または再処理の可否を判断する管理。", definition_id:"Produk retur/gagal dipisahkan, diselidiki penyebabnya, lalu diputuskan untuk dibuang atau diproses ulang." },
+  { id:119, category:"製造知識", term:"工場内動線管理", reading:"こうじょうないどうせんかんり", definition_ja:"原材料・製品・作業者・廃棄物の工場内の流れを管理し、汚染区域と清潔区域が交差しないようにする設計。", definition_id:"Pengelolaan alur bahan, produk, pekerja, dan sampah di pabrik agar zona kotor dan bersih tidak saling bersilang." },
+  { id:120, category:"製造知識", term:"受発注管理", reading:"じゅはっちゅうかんり", definition_ja:"原材料の発注と受け取りを適切に管理すること。在庫不足や過剰在庫を防ぎ、品質管理に必要な情報を記録する。", definition_id:"Pengelolaan pemesanan dan penerimaan bahan baku. Mencegah kekurangan/kelebihan stok dan mencatat info untuk manajemen kualitas." }
+];
+
+// ===== FURIGANA DICTIONARY =====
+// longest match first (longer entries take priority over shorter ones)
+const FURI_RAW = [
+  ['食品添加物','しょくひんてんかぶつ'],['健康診断','けんこうしんだん'],
+  ['酸素欠乏','さんそけつぼう'],['腸管出血性','ちょうかんしゅっけつせい'],
+  ['食中毒','しょくちゅうどく'],['原材料','げんざいりょう'],
+  ['微生物','びせいぶつ'],['廃棄物','はいきぶつ'],['化学物質','かがくぶっしつ'],
+  ['食品衛生','しょくひんえいせい'],['食品安全','しょくひんあんぜん'],
+  ['食品表示','しょくひんひょうじ'],['賞味期限','しょうみきげん'],
+  ['消費期限','しょうひきげん'],['衛生管理','えいせいかんり'],
+  ['品質管理','ひんしつかんり'],['工程管理','こうていかんり'],
+  ['製造工程','せいぞうこうてい'],['製造記録','せいぞうきろく'],
+  ['製造環境','せいぞうかんきょう'],['作業手順','さぎょうてじゅん'],
+  ['作業環境','さぎょうかんきょう'],['作業服','さぎょうふく'],
+  ['安全標識','あんぜんひょうしき'],['安全装置','あんぜんそうち'],
+  ['安全帯','あんぜんたい'],['緊急避難','きんきゅうひなん'],
+  ['労働災害','ろうどうさいがい'],['転倒災害','てんとうさいがい'],
+  ['落下災害','らっかさいがい'],['在庫管理','ざいこかんり'],
+  ['外観検査','がいかんけんさ'],['受入検査','うけいれけんさ'],
+  ['表示検査','ひょうじけんさ'],['管理基準','かんりきじゅん'],
+  ['改善措置','かいぜんそち'],['予防措置','よぼうそち'],
+  ['事業者','じぎょうしゃ'],['労働者','ろうどうしゃ'],['作業者','さぎょうしゃ'],
+  ['担当者','たんとうしゃ'],['責任者','せきにんしゃ'],['管理者','かんりしゃ'],
+  ['従業員','じゅうぎょういん'],['委員会','いいんかい'],
+  ['報告書','ほうこくしょ'],['手順書','てじゅんしょ'],
+  ['規格書','きかくしょ'],['添加物','てんかぶつ'],
+  ['不適合','ふてきごう'],['再処理','さいしょり'],
+  ['再発','さいはつ'],['発注','はっちゅう'],
+  ['食品','しょくひん'],['衛生','えいせい'],['管理','かんり'],
+  ['危害','きがい'],['要因','よういん'],['製造','せいぞう'],
+  ['工程','こうてい'],['記録','きろく'],['安全','あんぜん'],
+  ['労働','ろうどう'],['災害','さいがい'],['予防','よぼう'],
+  ['細菌','さいきん'],['感染','かんせん'],['増殖','ぞうしょく'],
+  ['汚染','おせん'],['温度','おんど'],['保存','ほぞん'],
+  ['製品','せいひん'],['品質','ひんしつ'],['確認','かくにん'],
+  ['検査','けんさ'],['報告','ほうこく'],['作業','さぎょう'],
+  ['手順','てじゅん'],['基準','きじゅん'],['清潔','せいけつ'],
+  ['消毒','しょうどく'],['殺菌','さっきん'],['洗浄','せんじょう'],
+  ['異物','いぶつ'],['混入','こんにゅう'],['機械','きかい'],
+  ['設備','せつび'],['施設','しせつ'],['加熱','かねつ'],
+  ['冷蔵','れいぞう'],['冷凍','れいとう'],['廃棄','はいき'],
+  ['改善','かいぜん'],['措置','そち'],['逸脱','いつだつ'],
+  ['法律','ほうりつ'],['義務','ぎむ'],['定期','ていき'],
+  ['健康','けんこう'],['診断','しんだん'],['教育','きょういく'],
+  ['訓練','くんれん'],['転倒','てんとう'],['避難','ひなん'],
+  ['応急','おうきゅう'],['処置','しょち'],['化学','かがく'],
+  ['物質','ぶっしつ'],['保護','ほご'],['危険','きけん'],
+  ['防止','ぼうし'],['除去','じょきょ'],['排除','はいじょ'],
+  ['識別','しきべつ'],['番号','ばんごう'],['出荷','しゅっか'],
+  ['在庫','ざいこ'],['区域','くいき'],['工場','こうじょう'],
+  ['原因','げんいん'],['分析','ぶんせき'],['評価','ひょうか'],
+  ['判断','はんだん'],['対策','たいさく'],['対応','たいおう'],
+  ['重要','じゅうよう'],['情報','じょうほう'],['共有','きょうゆう'],
+  ['活動','かつどう'],['実施','じっし'],['適切','てきせつ'],
+  ['正確','せいかく'],['文書','ぶんしょ'],['帳票','ちょうひょう'],
+  ['計量','けいりょう'],['測定','そくてい'],['装置','そうち'],
+  ['検出','けんしゅつ'],['処理','しょり'],['排水','はいすい'],
+  ['包装','ほうそう'],['梱包','こんぽう'],['充填','じゅうてん'],
+  ['重量','じゅうりょう'],['選別','せんべつ'],['点検','てんけん'],
+  ['整備','せいび'],['校正','こうせい'],['規格','きかく'],
+  ['外観','がいかん'],['表示','ひょうじ'],['農薬','のうやく'],
+  ['残留','ざんりゅう'],['毒素','どくそ'],['症状','しょうじょう'],
+  ['腹痛','ふくつう'],['下痢','げり'],['嘔吐','おうと'],
+  ['体温','たいおん'],['調節','ちょうせつ'],['環境','かんきょう'],
+  ['湿度','しつど'],['騒音','そうおん'],['粉塵','ふんじん'],
+  ['酸素','さんそ'],['換気','かんき'],['電気','でんき'],
+  ['感電','かんでん'],['足場','あしば'],['高所','こうしょ'],
+  ['落下','らっか'],['回転','かいてん'],['部分','ぶぶん'],
+  ['皮膚','ひふ'],['手袋','てぶくろ'],['帽子','ぼうし'],
+  ['毛髪','もうはつ'],['指輪','ゆびわ'],['時計','とけい'],
+  ['清掃','せいそう'],['整理','せいり'],['整頓','せいとん'],
+  ['維持','いじ'],['条件','じょうけん'],['数値','すうち'],
+  ['許可','きょか'],['禁止','きんし'],['違反','いはん'],
+  ['隔離','かくり'],['回収','かいしゅう'],['返品','へんぴん'],
+  ['苦情','くじょう'],['調査','ちょうさ'],['委託','いたく'],
+  ['責任','せきにん'],['監視','かんし'],['監査','かんさ'],
+  ['検証','けんしょう'],['熱中症','ねっちゅうしょう'],['腰痛','ようつう'],
+  ['聴力','ちょうりょく'],['低下','ていか'],['濃度','のうど'],
+  ['異常','いじょう'],['不良','ふりょう'],['遵守','じゅんしゅ'],
+  ['周知','しゅうち'],['巡視','じゅんし'],['巡回','じゅんかい'],
+  ['是正','ぜせい'],['確保','かくほ'],['水分','すいぶん'],
+  ['成分','せいぶん'],['期限','きげん'],['生産','せいさん'],
+  ['流通','りゅうつう'],['消費','しょうひ'],['追跡','ついせき'],
+  ['分別','ぶんべつ'],['区画','くかく'],['確保','かくほ'],
+  ['特定','とくてい'],['設置','せっち'],['操作','そうさ'],
+  ['停止','ていし'],['故障','こしょう'],['修理','しゅうり'],
+  ['交換','こうかん'],['精度','せいど'],['乾燥','かんそう'],
+  ['解凍','かいとう'],['流水','りゅうすい'],['密閉','みっぺい'],
+  ['酸性','さんせい'],['冷却','れいきゃく'],['迅速','じんそく'],
+  ['継続','けいぞく'],['記載','きさい'],['一般','いっぱん'],
+  ['事前','じぜん'],['是正','ぜせい'],['食材','しょくざい'],
+  ['魚介','ぎょかい'],['部門','ぶもん'],['担当','たんとう'],
+];
+
+// sort by kanji length descending (longest match first)
+const FURI_SORTED = [...FURI_RAW].sort((a, b) => b[0].length - a[0].length);
+
+function toRuby(text) {
+  if (!rubyMode) return text;
+  // Use placeholder trick to avoid double-replacement
+  let result = text;
+  const placeholders = [];
+  FURI_SORTED.forEach(([kanji, reading]) => {
+    if (result.includes(kanji)) {
+      const ph = '\x00' + placeholders.length + '\x00';
+      placeholders.push(`<ruby>${kanji}<rt>${reading}</rt></ruby>`);
+      result = result.split(kanji).join(ph);
+    }
+  });
+  // Restore
+  placeholders.forEach((html, i) => {
+    result = result.split('\x00' + i + '\x00').join(html);
+  });
+  return result;
+}
+
+// ===== STATE =====
+let filteredCards = [...CARDS];
+let currentIndex = 0;
+let isFlipped = false;
+let markedIds = JSON.parse(localStorage.getItem('shokuhin_marked') || '[]');
+let seenIds = JSON.parse(localStorage.getItem('shokuhin_seen') || '[]');
+let currentCat = 'すべて';
+let rubyMode = false;
+let idMode   = true;
+
+// ===== TOGGLE: RUBY =====
+function toggleRuby() {
+  rubyMode = !rubyMode;
+  const btn = document.getElementById('rubyBtn');
+  btn.textContent = rubyMode ? 'ルビ ON' : 'ルビ OFF';
+  btn.classList.toggle('on', rubyMode);
+  // re-render current view
+  if (currentMode === 'flash') renderCard();
+  else if (quizCurrent) renderQuizQuestion();
+}
+
+// ===== TOGGLE: INDONESIAN =====
+function toggleId() {
+  idMode = !idMode;
+  const btn = document.getElementById('idBtn');
+  btn.textContent = idMode ? '🇮🇩 ON' : '🇮🇩 OFF';
+  btn.classList.toggle('on', idMode);
+  applyIdVisibility();
+}
+function applyIdVisibility() {
+  const show = idMode ? '' : 'none';
+  // フラッシュカード裏面
+  const backSec = document.getElementById('backIdSection');
+  if (backSec) backSec.style.display = show;
+  // 4択フィードバック
+  const fbSec = document.getElementById('fbDefId');
+  if (fbSec) fbSec.style.display = show;
+  // 4択問題文のインドネシア語（def2term時のみ表示）
+  const qIdEl = document.getElementById('qQuestionId');
+  if (qIdEl && qIdEl.textContent) qIdEl.style.display = show;
+  // 4択選択肢のインドネシア語
+  document.querySelectorAll('.choice-id').forEach(el => {
+    el.style.display = show;
+  });
+}
+
+// ===== CATEGORY BUTTONS =====
+function buildCatButtons() {
+  const cats = ['すべて', ...new Set(CARDS.map(c => c.category)), '⭐ スター'];
+  const wrap = document.getElementById('catButtons');
+  wrap.innerHTML = '';
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (cat === currentCat ? ' active' : '');
+    const count = cat === 'すべて' ? CARDS.length :
+                  cat === '⭐ スター' ? markedIds.length :
+                  CARDS.filter(c => c.category === cat).length;
+    btn.textContent = `${cat}（${count}）`;
+    btn.onclick = () => selectCat(cat);
+    wrap.appendChild(btn);
+  });
+}
+
+function selectCat(cat) {
+  currentCat = cat;
+  if (cat === 'すべて') filteredCards = [...CARDS];
+  else if (cat === '⭐ スター') filteredCards = CARDS.filter(c => markedIds.includes(c.id));
+  else filteredCards = CARDS.filter(c => c.category === cat);
+  currentIndex = 0;
+  buildCatButtons();
+  renderCard();
+}
+
+// ===== CARD RENDER =====
+function renderCard() {
+  const panel = document.getElementById('resultPanel');
+  const cardArea = document.getElementById('cardArea');
+
+  if (filteredCards.length === 0) {
+    cardArea.style.display = 'none';
+    document.querySelector('.controls').style.display = 'none';
+    panel.innerHTML = '<p style="color:var(--text-sub);font-size:0.9rem;padding:40px 0;">このカテゴリにカードがありません</p>';
+    panel.classList.add('show');
+    updateHeader();
+    return;
+  }
+
+  panel.classList.remove('show');
+  cardArea.style.display = 'block';
+  document.querySelector('.controls').style.display = 'flex';
+
+  setFlipped(false);
+
+  const card = filteredCards[currentIndex];
+  document.getElementById('frontCat').textContent  = card.category;
+  document.getElementById('termKanji').textContent  = card.term;
+  document.getElementById('termReading').textContent = card.reading;
+  document.getElementById('backCat').textContent    = card.category;
+  document.getElementById('backTerm').textContent   = card.term;
+  document.getElementById('defJa').innerHTML        = toRuby(card.definition_ja);
+  document.getElementById('defId').textContent      = card.definition_id;
+  document.getElementById('cardNum').textContent    = `${currentIndex + 1} / ${filteredCards.length}`;
+  applyIdVisibility();
+
+  const markBtn = document.getElementById('markBtn');
+  markBtn.textContent = markedIds.includes(card.id) ? '⭐ スター済' : '⭐ スター';
+  markBtn.classList.toggle('marked', markedIds.includes(card.id));
+
+  if (!seenIds.includes(card.id)) {
+    seenIds.push(card.id);
+    localStorage.setItem('shokuhin_seen', JSON.stringify(seenIds));
+  }
+  updateProgress();
+  updateHeader();
+}
+
+function updateProgress() {
+  const total = filteredCards.length;
+  const seen = filteredCards.filter(c => seenIds.includes(c.id)).length;
+  const pct = total ? Math.round(seen / total * 100) : 0;
+  document.getElementById('progressLabel').textContent = `学習済み ${seen} / ${total} 枚`;
+  document.getElementById('progressPct').textContent = pct + '%';
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+function updateHeader() {
+  document.getElementById('headerCount').textContent = `${filteredCards.length} 枚`;
+}
+
+// ===== FLIP =====
+function setFlipped(val) {
+  isFlipped = val;
+  document.getElementById('cardArea').classList.toggle('flipped', val);
+}
+
+function flipCard() { setFlipped(!isFlipped); }
+
+// ===== NAV =====
+function nextCard() {
+  if (currentIndex < filteredCards.length - 1) {
+    currentIndex++;
+    renderCard();
+  } else {
+    showResult();
+  }
+}
+
+function prevCard() {
+  if (currentIndex > 0) {
+    currentIndex--;
+    renderCard();
+  }
+}
+
+function showResult() {
+  const total = filteredCards.length;
+  const seen = filteredCards.filter(c => seenIds.includes(c.id)).length;
+  const panel = document.getElementById('resultPanel');
+  document.getElementById('resultMsg').textContent =
+    `${total}枚中 ${seen}枚を学習しました！おつかれさまでした 🎉`;
+  panel.classList.add('show');
+  document.getElementById('cardArea').style.display = 'none';
+  document.querySelector('.controls').style.display = 'none';
+}
+
+function restartAll() {
+  currentIndex = 0;
+  document.getElementById('cardArea').style.display = 'block';
+  document.querySelector('.controls').style.display = 'flex';
+  document.getElementById('resultPanel').classList.remove('show');
+  renderCard();
+}
+
+// ===== SHUFFLE =====
+function shuffleCards() {
+  for (let i = filteredCards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [filteredCards[i], filteredCards[j]] = [filteredCards[j], filteredCards[i]];
+  }
+  currentIndex = 0;
+  renderCard();
+}
+
+// ===== MARK =====
+function toggleMark() {
+  const card = filteredCards[currentIndex];
+  if (!card) return;
+  if (markedIds.includes(card.id)) {
+    markedIds = markedIds.filter(id => id !== card.id);
+  } else {
+    markedIds.push(card.id);
+  }
+  localStorage.setItem('shokuhin_marked', JSON.stringify(markedIds));
+  buildCatButtons();
+  renderCard();
+}
+
+// ===== RESET =====
+function resetProgress() {
+  if (!confirm('学習進捗をリセットしますか？')) return;
+  seenIds = [];
+  localStorage.removeItem('shokuhin_seen');
+  currentIndex = 0;
+  renderCard();
+}
+
+// ===== KEYBOARD =====
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') nextCard();
+  else if (e.key === 'ArrowLeft') prevCard();
+  else if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+});
+
+// ===== TOUCH SWIPE =====
+let touchStartX = 0;
+document.getElementById('cardArea').addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+}, { passive: true });
+document.getElementById('cardArea').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 60) {
+    if (dx < 0) nextCard(); else prevCard();
+  } else {
+    flipCard();
+  }
+}, { passive: true });
+
+// ===== PASSWORD VISIBILITY =====
+function togglePwVisibility() {
+  const input = document.getElementById('loginInput');
+  const btn   = document.getElementById('togglePwBtn');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+    btn.title = 'パスワードを隠す';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+    btn.title = 'パスワードを表示';
+  }
+}
+
+// ===== LOGIN =====
+const APP_PASSWORD = 'genkidesu2026';
+
+function doLogin() {
+  const input = document.getElementById('loginInput').value;
+  if (input === APP_PASSWORD) {
+    localStorage.setItem('shokuhin_auth', '1');
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('loginInput').value = '';
+    document.getElementById('loginError').classList.remove('show');
+  } else {
+    document.getElementById('loginError').classList.add('show');
+    document.getElementById('loginInput').value = '';
+    document.getElementById('loginInput').focus();
+  }
+}
+
+if (localStorage.getItem('shokuhin_auth') === '1') {
+  document.getElementById('loginOverlay').style.display = 'none';
+} else {
+  setTimeout(() => document.getElementById('loginInput').focus(), 100);
+}
+
+// ===== INIT =====
+buildCatButtons();
+renderCard();
+
+// ===========================
+// ===== QUIZ LOGIC ==========
+// ===========================
+let currentMode = 'flash';
+let quizQtype = 'mixed';
+let quizQnum  = 20;
+let quizDeck  = [];
+let quizIndex = 0;
+let quizScore = 0;
+let quizWrongCards = [];
+let quizCurrent = null;
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.getElementById('flashScreen').classList.toggle('hidden', mode !== 'flash');
+  document.getElementById('quizScreen').classList.toggle('active',  mode === 'quiz');
+  document.getElementById('tabFlash').classList.toggle('active', mode === 'flash');
+  document.getElementById('tabQuiz').classList.toggle('active',  mode === 'quiz');
+  document.getElementById('bottomBarFlash').style.display = mode === 'flash' ? 'flex' : 'none';
+  document.getElementById('bottomBarQuiz').classList.toggle('active', mode === 'quiz');
+  if (mode === 'quiz') showQuizStart();
+}
+
+function selectQtype(type) {
+  quizQtype = type;
+  ['optMixed','optTerm2Def','optDef2Term'].forEach(id => document.getElementById(id).classList.remove('selected'));
+  const map = { mixed:'optMixed', term2def:'optTerm2Def', def2term:'optDef2Term' };
+  document.getElementById(map[type]).classList.add('selected');
+}
+
+function selectQnum(n) {
+  quizQnum = n;
+  ['qnum10','qnum20','qnumAll'].forEach(id => document.getElementById(id).classList.remove('selected'));
+  const map = { 10:'qnum10', 20:'qnum20', 0:'qnumAll' };
+  document.getElementById(map[n]).classList.add('selected');
+}
+
+function showQuizStart() {
+  document.getElementById('quizStartScreen').style.display = 'block';
+  document.getElementById('quizQuestionScreen').style.display = 'none';
+  document.getElementById('quizResultScreen').classList.remove('show');
+}
+
+function startQuiz(retryCards) {
+  const pool = retryCards || filteredCards;
+  if (pool.length < 4) {
+    alert('このカテゴリの用語が4枚未満です。「すべて」を選んでください。');
+    return;
+  }
+  quizDeck = [...pool].sort(() => Math.random() - 0.5);
+  if (!retryCards && quizQnum > 0) quizDeck = quizDeck.slice(0, quizQnum);
+  quizIndex = 0;
+  quizScore = 0;
+  quizWrongCards = [];
+  document.getElementById('quizStartScreen').style.display = 'none';
+  document.getElementById('quizQuestionScreen').style.display = 'block';
+  document.getElementById('quizResultScreen').classList.remove('show');
+  renderQuizQuestion();
+}
+
+function generateQuestion(card, type) {
+  const others = CARDS.filter(c => c.id !== card.id)
+                      .sort(() => Math.random() - 0.5).slice(0, 3);
+  const correctIdx = Math.floor(Math.random() * 4);
+  const choices = [...others];
+  choices.splice(correctIdx, 0, card);
+  return { card, type, choices, correctIdx };
+}
+
+function renderQuizQuestion() {
+  const card = quizDeck[quizIndex];
+  let type = quizQtype;
+  if (type === 'mixed') type = Math.random() < 0.5 ? 'term2def' : 'def2term';
+
+  quizCurrent = generateQuestion(card, type);
+
+  const total = quizDeck.length;
+  document.getElementById('qScoreCorrect').textContent = quizScore;
+  document.getElementById('qScoreTotal').textContent = total;
+  document.getElementById('qMiniFill').style.width = (quizIndex / total * 100) + '%';
+  document.getElementById('qScorePct').textContent =
+    quizIndex > 0 ? Math.round(quizScore / quizIndex * 100) + '%' : '-';
+  document.getElementById('qNumLabel').textContent = `第${quizIndex + 1}問 / ${total}問`;
+
+  const qIdEl = document.getElementById('qQuestionId');
+  if (type === 'term2def') {
+    document.getElementById('qTypeLabel').textContent   = '用語→意味';
+    document.getElementById('qQuestionText').textContent = `「${card.term}」`;
+    document.getElementById('qQuestionSub').textContent  =
+      card.reading ? `（${card.reading}）の意味はどれですか？` : 'の意味はどれですか？';
+    qIdEl.style.display = 'none';   // term表示時はID訳なし
+  } else {
+    document.getElementById('qTypeLabel').textContent   = '意味→用語';
+    document.getElementById('qQuestionText').innerHTML  = toRuby(card.definition_ja);
+    document.getElementById('qQuestionSub').textContent = '上の説明にあてはまる用語はどれですか？';
+    qIdEl.textContent    = '🇮🇩 ' + card.definition_id;
+    qIdEl.style.display  = idMode ? '' : 'none';
+  }
+
+  quizCurrent.choices.forEach((c, i) => {
+    const btn = document.getElementById('choice' + i);
+    if (type === 'term2def') {
+      // 日本語定義 ＋ インドネシア語（toggle可）
+      const idSpan = `<span class="choice-id" style="display:${idMode ? '' : 'none'}">🇮🇩 ${c.definition_id}</span>`;
+      btn.innerHTML = `<span>${toRuby(c.definition_ja)}</span>${idSpan}`;
+    } else {
+      btn.innerHTML = toRuby(c.term);
+    }
+    btn.className = 'quiz-choice';
+    btn.disabled  = false;
+  });
+
+  const fb = document.getElementById('qFeedback');
+  fb.className = 'quiz-feedback';
+  document.getElementById('qNextBtn').className = 'quiz-next-btn';
+}
+
+function handleAnswer(chosenIdx) {
+  const { card, type, choices, correctIdx } = quizCurrent;
+  const isCorrect = chosenIdx === correctIdx;
+
+  for (let i = 0; i < 4; i++) document.getElementById('choice' + i).disabled = true;
+  document.getElementById('choice' + correctIdx).classList.add('correct');
+  if (!isCorrect) document.getElementById('choice' + chosenIdx).classList.add('wrong');
+  // choice-id の色はCSSで自動変化（.correct/.wrong の子要素として定義済み）
+
+  const fb = document.getElementById('qFeedback');
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'ok' : 'ng');
+  document.getElementById('fbAnswer').textContent  =
+    isCorrect ? '✅ 正解！' : `❌ 不正解　正解：「${card.term}」`;
+  document.getElementById('fbDef').innerHTML       = toRuby(card.definition_ja);
+  document.getElementById('fbDefIdText').textContent = card.definition_id;
+  applyIdVisibility();
+
+  if (isCorrect) {
+    quizScore++;
+  } else {
+    if (!quizWrongCards.find(c => c.id === card.id)) quizWrongCards.push(card);
+  }
+
+  const total = quizDeck.length;
+  document.getElementById('qScoreCorrect').textContent = quizScore;
+  if (quizIndex + 1 > 0) {
+    document.getElementById('qScorePct').textContent =
+      Math.round(quizScore / (quizIndex + 1) * 100) + '%';
+  }
+
+  document.getElementById('qNextBtn').className = 'quiz-next-btn show';
+  document.getElementById('qNextBtn').textContent =
+    quizIndex + 1 >= total ? '結果を見る ›' : '次の問題 ›';
+}
+
+function nextQuizQuestion() {
+  quizIndex++;
+  if (quizIndex >= quizDeck.length) {
+    showQuizResult();
+  } else {
+    renderQuizQuestion();
+  }
+}
+
+function showQuizResult() {
+  document.getElementById('quizQuestionScreen').style.display = 'none';
+  const total = quizDeck.length;
+  const pct = Math.round(quizScore / total * 100);
+  let emoji = '😢', title = 'もう少し！';
+  if (pct >= 80) { emoji = '🎉'; title = '素晴らしい！'; }
+  else if (pct >= 60) { emoji = '😊'; title = 'よくできました！'; }
+  else if (pct >= 40) { emoji = '🙂'; title = 'もう一息！'; }
+
+  document.getElementById('resultEmoji').textContent = emoji;
+  document.getElementById('resultTitle').textContent = title;
+  document.getElementById('resultScoreDisplay').textContent = `${quizScore} / ${total}`;
+  document.getElementById('resultScoreLabel').textContent = `正解率 ${pct}%`;
+  document.getElementById('rcCorrect').textContent = quizScore;
+  document.getElementById('rcWrong').textContent = total - quizScore;
+
+  const retryBtn = document.getElementById('retryWrongBtn');
+  if (quizWrongCards.length > 0) {
+    retryBtn.style.display = '';
+    retryBtn.textContent = `❌ 間違えた${quizWrongCards.length}問を復習`;
+  } else {
+    retryBtn.style.display = 'none';
+  }
+
+  document.getElementById('quizResultScreen').classList.add('show');
+}
+
+function retryWrong() {
+  if (quizWrongCards.length === 0) return;
+  startQuiz(quizWrongCards);
+}
+</script>
+</body>
+</html>
