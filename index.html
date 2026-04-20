@@ -382,23 +382,53 @@
   .quiz-choice.correct .choice-id { color: #15803d; border-top-color: #86efac; }
   .quiz-choice.wrong   .choice-id { color: #dc2626; border-top-color: #fca5a5; }
 
-  /* ===== SETTINGS BAR ===== */
-  .settings-bar {
-    background: #fafafa; border-bottom: 1px solid #e5e7eb;
-    padding: 7px 12px; display: flex; gap: 8px; align-items: center;
-    max-width: 600px; margin: 0 auto;
+  /* ===== RUBY BAR (iOSスイッチ) ===== */
+  .ruby-bar {
+    background: #f9fafb; border-bottom: 1px solid #e5e7eb;
+    padding: 6px 16px; display: flex; align-items: center; justify-content: flex-end; gap: 8px;
   }
-  .settings-label {
-    font-size: 0.7rem; color: var(--text-sub); font-weight: bold;
-    white-space: nowrap;
+  .ruby-bar-label { font-size: 0.72rem; color: var(--text-sub); }
+  .ruby-toggle-wrap { display: flex; align-items: center; gap: 6px; }
+  .ruby-toggle-switch {
+    position: relative; width: 46px; height: 26px;
+    background: #d1d5db; border-radius: 13px;
+    border: none; cursor: pointer; transition: background .25s;
+    flex-shrink: 0; padding: 0;
   }
-  .setting-btn {
-    padding: 5px 12px; border-radius: 16px; border: 1.5px solid #d1d5db;
-    background: white; color: var(--gray); font-size: 0.75rem; font-weight: bold;
-    cursor: pointer; transition: all .2s; white-space: nowrap;
+  .ruby-toggle-switch.on { background: var(--orange); }
+  .ruby-toggle-knob {
+    position: absolute; top: 3px; left: 3px;
+    width: 20px; height: 20px; border-radius: 50%; background: white;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.25); transition: transform .25s;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.6rem; font-weight: bold; color: #9ca3af; pointer-events: none;
   }
-  .setting-btn:hover { border-color: var(--orange); color: var(--orange); }
-  .setting-btn.on { background: var(--orange); color: white; border-color: var(--orange); }
+  .ruby-toggle-switch.on .ruby-toggle-knob { transform: translateX(20px); color: var(--orange); }
+  .ruby-status-text {
+    font-size: 0.72rem; font-weight: bold; color: var(--text-sub);
+    min-width: 24px; transition: color .2s;
+  }
+  .ruby-status-text.on { color: var(--orange); }
+
+  /* ===== QUIZ INDONESIAN TOGGLE ===== */
+  .quiz-id-toggle {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 14px; padding: 6px 12px;
+    border: 1.5px dashed #9ca3af; border-radius: 20px;
+    background: none; cursor: pointer; font-size: 0.75rem;
+    color: #9ca3af; transition: all .2s; font-weight: bold;
+  }
+  .quiz-id-toggle:hover { border-color: var(--orange); color: var(--orange); background: var(--orange-light); }
+  .quiz-id-toggle.active { border-color: #f59e0b; color: #b45309; background: #fef9c3; border-style: solid; }
+  .quiz-id-box {
+    display: none; margin-top: 10px;
+    background: #fffbeb; border-left: 3px solid #f59e0b;
+    border-radius: 8px; padding: 10px 14px;
+    font-size: 0.82rem; color: #78350f; line-height: 1.6;
+  }
+  .quiz-id-box.show { display: block; }
+  .quiz-id-box .id-label { font-size: 0.65rem; font-weight: bold; color: #b45309; display: block; margin-bottom: 4px; }
+  .quiz-ruby-row { display: flex; justify-content: flex-end; margin-bottom: 8px; }
 </style>
 </head>
 <body>
@@ -445,11 +475,13 @@
   </div>
 </div>
 
-<div style="background:#fafafa; border-bottom:1px solid #e5e7eb;">
-  <div class="settings-bar">
-    <span class="settings-label">表示設定：</span>
-    <button class="setting-btn" id="rubyBtn" onclick="toggleRuby()">ルビ OFF</button>
-    <button class="setting-btn on"  id="idBtn"   onclick="toggleId()">🇮🇩 ON</button>
+<div class="ruby-bar">
+  <span class="ruby-bar-label">ふりがな</span>
+  <div class="ruby-toggle-wrap">
+    <button class="ruby-toggle-switch" id="globalRubySwitch" onclick="toggleGlobalRuby()">
+      <div class="ruby-toggle-knob">ふ</div>
+    </button>
+    <span class="ruby-status-text" id="globalRubyText">OFF</span>
   </div>
 </div>
 
@@ -464,6 +496,9 @@
   <div class="quiz-start-screen" id="quizStartScreen">
     <h2>📝 4択練習</h2>
     <p>出題形式と問題数を選んでスタート！<br>カテゴリは上のタブで絞り込めます。</p>
+    <div id="quizCatBadge" style="display:inline-flex; align-items:center; gap:6px; background:var(--orange-light); color:var(--orange-dark); border-radius:20px; padding:5px 14px; font-size:0.82rem; font-weight:bold; margin-bottom:14px;">
+      📂 <span id="quizCatName">すべて</span>（<span id="quizCatCount">120</span>枚）
+    </div>
     <div class="quiz-start-options">
       <button class="quiz-opt-btn selected" id="optMixed" onclick="selectQtype('mixed')">
         <span class="opt-icon">🔀</span>
@@ -506,8 +541,21 @@
       <span class="quiz-qtype" id="qTypeLabel">用語→意味</span>
       <div class="quiz-question-text" id="qQuestionText">-</div>
       <div class="quiz-question-sub" id="qQuestionSub"></div>
-      <div class="q-id-text" id="qQuestionId" style="display:none;"></div>
+      <button class="quiz-id-toggle" id="qIdToggleBtn" onclick="toggleQuizId()">
+        🇮🇩 <span id="qIdToggleLabel">インドネシア語を表示</span>
+      </button>
+      <div class="quiz-id-box" id="qIdBox">
+        <span class="id-label">🇮🇩 Bahasa Indonesia</span>
+        <span id="qIdText"></span>
+      </div>
     </div>
+
+    <div class="quiz-ruby-row" id="qRubyRow" style="gap:8px; justify-content:flex-end;">
+      <button class="quiz-id-toggle" id="qChoiceIdToggleBtn" onclick="toggleChoiceId()" style="display:none;">
+        🇮🇩 <span id="qChoiceIdToggleLabel">インドネシア語なし</span>
+      </button>
+    </div>
+
     <div class="quiz-choices" id="qChoices">
       <button class="quiz-choice" id="choice0" onclick="handleAnswer(0)"></button>
       <button class="quiz-choice" id="choice1" onclick="handleAnswer(1)"></button>
@@ -572,12 +620,10 @@
         <div>
           <div class="back-def-label">🇯🇵 日本語</div>
           <div class="back-def-ja" id="defJa">-</div>
-          <div id="backIdSection">
-            <div class="back-def-label">🇮🇩 Bahasa Indonesia</div>
-            <div class="back-def-id">
-              <span class="id-lang">Terjemahan</span>
-              <span id="defId">-</span>
-            </div>
+          <div class="back-def-label">🇮🇩 Bahasa Indonesia</div>
+          <div class="back-def-id">
+            <span class="id-lang">Terjemahan</span>
+            <span id="defId">-</span>
           </div>
         </div>
       </div>
@@ -862,43 +908,59 @@ let isFlipped = false;
 let markedIds = JSON.parse(localStorage.getItem('shokuhin_marked') || '[]');
 let seenIds = JSON.parse(localStorage.getItem('shokuhin_seen') || '[]');
 let currentCat = 'すべて';
-let rubyMode = false;
-let idMode   = true;
+let rubyMode        = false;
+let showIdInQuiz    = false;  // クイズ問題文のインドネシア語
+let showIdInChoices = false;  // 選択肢のインドネシア語
 
-// ===== TOGGLE: RUBY =====
-function toggleRuby() {
+// ===== TOGGLE: RUBY (iOSスイッチ) =====
+function toggleGlobalRuby() {
   rubyMode = !rubyMode;
-  const btn = document.getElementById('rubyBtn');
-  btn.textContent = rubyMode ? 'ルビ ON' : 'ルビ OFF';
-  btn.classList.toggle('on', rubyMode);
-  // re-render current view
+  const sw  = document.getElementById('globalRubySwitch');
+  const txt = document.getElementById('globalRubyText');
+  txt.textContent = rubyMode ? 'ON' : 'OFF';
+  txt.classList.toggle('on', rubyMode);
+  sw.classList.toggle('on', rubyMode);
   if (currentMode === 'flash') renderCard();
   else if (quizCurrent) renderQuizQuestion();
 }
 
-// ===== TOGGLE: INDONESIAN =====
-function toggleId() {
-  idMode = !idMode;
-  const btn = document.getElementById('idBtn');
-  btn.textContent = idMode ? '🇮🇩 ON' : '🇮🇩 OFF';
-  btn.classList.toggle('on', idMode);
-  applyIdVisibility();
+// ===== TOGGLE: QUIZ INDONESIAN (問題ごと) =====
+function toggleQuizId() {
+  showIdInQuiz = !showIdInQuiz;
+  applyQuizIdState();
 }
-function applyIdVisibility() {
-  const show = idMode ? '' : 'none';
-  // フラッシュカード裏面
-  const backSec = document.getElementById('backIdSection');
-  if (backSec) backSec.style.display = show;
-  // 4択フィードバック
-  const fbSec = document.getElementById('fbDefId');
-  if (fbSec) fbSec.style.display = show;
-  // 4択問題文のインドネシア語（def2term時のみ表示）
-  const qIdEl = document.getElementById('qQuestionId');
-  if (qIdEl && qIdEl.textContent) qIdEl.style.display = show;
-  // 4択選択肢のインドネシア語
-  document.querySelectorAll('.choice-id').forEach(el => {
-    el.style.display = show;
-  });
+function applyQuizIdState() {
+  const btn   = document.getElementById('qIdToggleBtn');
+  const box   = document.getElementById('qIdBox');
+  const label = document.getElementById('qIdToggleLabel');
+  if (showIdInQuiz) {
+    box.classList.add('show');
+    btn.classList.add('active');
+    label.textContent = 'インドネシア語を隠す';
+  } else {
+    box.classList.remove('show');
+    btn.classList.remove('active');
+    label.textContent = 'インドネシア語を表示';
+  }
+}
+
+// ===== TOGGLE: CHOICE INDONESIAN (選択肢ごと) =====
+function toggleChoiceId() {
+  showIdInChoices = !showIdInChoices;
+  applyChoiceIdState();
+  rerenderChoiceLabels();
+}
+function applyChoiceIdState() {
+  const btn   = document.getElementById('qChoiceIdToggleBtn');
+  const label = document.getElementById('qChoiceIdToggleLabel');
+  if (!btn) return;
+  if (showIdInChoices) {
+    btn.classList.add('active');
+    label.textContent = 'インドネシア語あり';
+  } else {
+    btn.classList.remove('active');
+    label.textContent = 'インドネシア語なし';
+  }
 }
 
 // ===== CATEGORY BUTTONS =====
@@ -925,7 +987,23 @@ function selectCat(cat) {
   else filteredCards = CARDS.filter(c => c.category === cat);
   currentIndex = 0;
   buildCatButtons();
-  renderCard();
+
+  if (currentMode === 'flash') {
+    renderCard();
+  } else {
+    // クイズモード：問題中なら即リスタート、スタート画面なら件数だけ更新
+    const onQuestion = document.getElementById('quizQuestionScreen').style.display !== 'none';
+    if (onQuestion) {
+      if (filteredCards.length < 4) {
+        alert('このカテゴリのカードが4枚未満のため、クイズを開始できません。');
+        showQuizStart();
+        return;
+      }
+      startQuiz();
+    } else {
+      showQuizStart();
+    }
+  }
 }
 
 // ===== CARD RENDER =====
@@ -957,7 +1035,6 @@ function renderCard() {
   document.getElementById('defJa').innerHTML        = toRuby(card.definition_ja);
   document.getElementById('defId').textContent      = card.definition_id;
   document.getElementById('cardNum').textContent    = `${currentIndex + 1} / ${filteredCards.length}`;
-  applyIdVisibility();
 
   const markBtn = document.getElementById('markBtn');
   markBtn.textContent = markedIds.includes(card.id) ? '⭐ スター済' : '⭐ スター';
@@ -1165,6 +1242,9 @@ function showQuizStart() {
   document.getElementById('quizStartScreen').style.display = 'block';
   document.getElementById('quizQuestionScreen').style.display = 'none';
   document.getElementById('quizResultScreen').classList.remove('show');
+  // カテゴリバッジ更新
+  document.getElementById('quizCatName').textContent = currentCat;
+  document.getElementById('quizCatCount').textContent = filteredCards.length;
 }
 
 function startQuiz(retryCards) {
@@ -1208,27 +1288,46 @@ function renderQuizQuestion() {
     quizIndex > 0 ? Math.round(quizScore / quizIndex * 100) + '%' : '-';
   document.getElementById('qNumLabel').textContent = `第${quizIndex + 1}問 / ${total}問`;
 
-  const qIdEl = document.getElementById('qQuestionId');
+  // インドネシア語トグルをリセット（問題が変わったら隠す）
+  showIdInQuiz    = false;
+  showIdInChoices = false;
+
   if (type === 'term2def') {
-    document.getElementById('qTypeLabel').textContent   = '用語→意味';
-    document.getElementById('qQuestionText').textContent = `「${card.term}」`;
-    document.getElementById('qQuestionSub').textContent  =
-      card.reading ? `（${card.reading}）の意味はどれですか？` : 'の意味はどれですか？';
-    qIdEl.style.display = 'none';   // term表示時はID訳なし
+    document.getElementById('qTypeLabel').textContent = '用語→意味';
+    // ルビONのとき用語にふりがな
+    if (rubyMode && card.reading) {
+      document.getElementById('qQuestionText').innerHTML =
+        `「<ruby>${card.term}<rt>${card.reading}</rt></ruby>」`;
+      document.getElementById('qQuestionSub').textContent = 'の意味はどれですか？';
+    } else {
+      document.getElementById('qQuestionText').textContent = `「${card.term}」`;
+      document.getElementById('qQuestionSub').textContent =
+        card.reading ? `（${card.reading}）の意味はどれですか？` : 'の意味はどれですか？';
+    }
   } else {
     document.getElementById('qTypeLabel').textContent   = '意味→用語';
     document.getElementById('qQuestionText').innerHTML  = toRuby(card.definition_ja);
     document.getElementById('qQuestionSub').textContent = '上の説明にあてはまる用語はどれですか？';
-    qIdEl.textContent    = '🇮🇩 ' + card.definition_id;
-    qIdEl.style.display  = idMode ? '' : 'none';
   }
 
+  // インドネシア語ボックスをセット（状態はリセット済）
+  document.getElementById('qIdText').textContent = card.definition_id;
+  applyQuizIdState();
+
+  // 選択肢インドネシア語ボタンは term2def のときだけ表示
+  document.getElementById('qChoiceIdToggleBtn').style.display =
+    type === 'term2def' ? 'inline-flex' : 'none';
+  applyChoiceIdState();
+
+  // 選択肢を描画
   quizCurrent.choices.forEach((c, i) => {
     const btn = document.getElementById('choice' + i);
     if (type === 'term2def') {
-      // 日本語定義 ＋ インドネシア語（toggle可）
-      const idSpan = `<span class="choice-id" style="display:${idMode ? '' : 'none'}">🇮🇩 ${c.definition_id}</span>`;
-      btn.innerHTML = `<span>${toRuby(c.definition_ja)}</span>${idSpan}`;
+      const jaText = toRuby(c.definition_ja);
+      const idSpan = showIdInChoices
+        ? `<span class="choice-id">🇮🇩 ${c.definition_id}</span>`
+        : '';
+      btn.innerHTML = `<span>${jaText}</span>${idSpan}`;
     } else {
       btn.innerHTML = toRuby(c.term);
     }
@@ -1239,6 +1338,24 @@ function renderQuizQuestion() {
   const fb = document.getElementById('qFeedback');
   fb.className = 'quiz-feedback';
   document.getElementById('qNextBtn').className = 'quiz-next-btn';
+}
+
+function rerenderChoiceLabels() {
+  if (!quizCurrent) return;
+  const { type, choices } = quizCurrent;
+  choices.forEach((c, i) => {
+    const btn = document.getElementById('choice' + i);
+    if (!btn) return;
+    if (type === 'term2def') {
+      const jaText = toRuby(c.definition_ja);
+      const idSpan = showIdInChoices
+        ? `<span class="choice-id">🇮🇩 ${c.definition_id}</span>`
+        : '';
+      btn.innerHTML = `<span>${jaText}</span>${idSpan}`;
+    } else {
+      btn.innerHTML = toRuby(c.term);
+    }
+  });
 }
 
 function handleAnswer(chosenIdx) {
@@ -1256,7 +1373,6 @@ function handleAnswer(chosenIdx) {
     isCorrect ? '✅ 正解！' : `❌ 不正解　正解：「${card.term}」`;
   document.getElementById('fbDef').innerHTML       = toRuby(card.definition_ja);
   document.getElementById('fbDefIdText').textContent = card.definition_id;
-  applyIdVisibility();
 
   if (isCorrect) {
     quizScore++;
